@@ -25,5 +25,6 @@ Route::controller(PageController::class)->group(function () {
 Route::controller(AdminLoginController::class)->group(function () {
     Route::get('/admin/login', 'showLoginForm');
     Route::post('/admin/login', 'login')->name('admin.login');
+    Route::post('/admin/logout', 'logout')->name('admin.logout');
 
 });
