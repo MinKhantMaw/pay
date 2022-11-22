@@ -32,34 +32,18 @@
     <div class="scrollbar-sidebar">
         <div class="app-sidebar__inner">
             <ul class="vertical-nav-menu">
-                <li class="app-sidebar__heading">Menu</li>
-                <li class="mm-active">
-                    <a href="{{ route('admin.home') }}">
+                <li class="app-sidebar__heading">Dashboards</li>
+                <li>
+                    <a href="{{ route('admin.home') }}" class="@yield('dashboard')">
                         <i class="metismenu-icon pe-7s-rocket"></i>
                         Dashboards
-                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                     </a>
-                    <ul>
-                        <li>
-                            <a href="index.html" class="mm-active">
-                                <i class="metismenu-icon">
-                                </i>Analytics
-                            </a>
-                        </li>
-                        <li>
-                            <a href="dashboards-commerce.html">
-                                <i class="metismenu-icon">
-                                </i>Commerce
-                            </a>
-                        </li>
-                        <li>
-                            <a href="dashboards-sales.html">
-                                <i class="metismenu-icon">
-                                </i>Sales
-                            </a>
-                        </li>
-
-                    </ul>
+                </li>
+                <li>
+                    <a href="{{ route('admin-user.index') }}" class="@yield('admin-user-index')">
+                        <i class="metismenu-icon pe-7s-users">
+                        </i>Admin User Management
+                    </a>
                 </li>
             </ul>
         </div>

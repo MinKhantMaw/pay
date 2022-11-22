@@ -1,4 +1,5 @@
 @extends('backend.layouts.app')
+@section('dashboard', 'mm-active')
 @section('title', 'Admin Dashboard')
 @section('content')
     <div class="app-page-title">
