@@ -1,5 +1,6 @@
 @extends('backend.layouts.app')
 @section('admin-user-index', 'mm-active')
+
 @section('title', 'Admin User List')
 @section('content')
     <div class="app-page-title">
@@ -9,50 +10,60 @@
                     <i class="pe-7s-users icon-gradient bg-mean-fruit">
                     </i>
                 </div>
-                <div>Admin User List
+                <div>Admin User Management
                 </div>
             </div>
+
         </div>
     </div>
-    <div class="content">
-        <div class="container">
-            <div class="card">
-                <div class="card-title">
-                    <div class="card-header">
-                        <p>Admin User List</p>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <table class="table" id="example">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Phone</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($admin_users as $admin_user)
-                                <tr>
-                                    <th scope="row">{{ $admin_user->id }}</th>
-                                    <td>{{ $admin_user->name }}</td>
-                                    <td>{{ $admin_user->email }}</td>
-                                    <td>{{ $admin_user->phone }}</td>
+    <div class="">
+        <a href="{{ route('admin.admin-user.create') }}" class="btn btn-primary"><i class="fas fa-plus-circle"></i>create
+            new admin</a>
+    </div>
+    <div class="content pt-3">
+        <div class="row">
+            <div class="col-md-6 col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table" id="admin-user">
+                            <thead>
+                                <tr class="bg-light">
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
 @section('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
     <script>
         $(document).ready(function() {
-            $('#example').DataTable();
+            var table = $('#admin-user').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: '{{ route('admin.getDatatable') }}',
+                columns: [{
+                        data: 'name',
+                        name: 'name',
+                    },
+                    {
+                        data: 'email',
+                        name: 'email',
+                    },
+                    {
+                        data: 'phone',
+                        name: 'phone',
+                    },
+                ]
+            });
         });
     </script>
 @endsection

@@ -40,9 +40,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin-user.index') }}" class="@yield('admin-user-index')">
+                    <a href="{{ route('admin.admin-user.index') }}" class="@yield('admin-user-index')">
                         <i class="metismenu-icon pe-7s-users">
-                        </i>Admin User Management
+                        </i>Admin Users
                     </a>
                 </li>
             </ul>

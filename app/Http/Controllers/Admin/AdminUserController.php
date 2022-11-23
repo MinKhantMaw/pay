@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Bankend;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\AdminUser;
 use Illuminate\Http\Request;
+use Yajra\DataTables\DataTables;
 use App\Http\Controllers\Controller;
 
 class AdminUserController extends Controller
@@ -15,9 +16,15 @@ class AdminUserController extends Controller
      */
     public function index()
     {
-        $admin_users = AdminUser::get();
-        return view('backend.admin_users.index',compact('admin_users'));
+        return view('backend.admin_users.index');
     }
+
+   public function ssd()
+    {
+        $data=AdminUser::query();
+        return Datatables::of($data)->make(true);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -26,7 +33,7 @@ class AdminUserController extends Controller
      */
     public function create()
     {
-        //
+        return view('backend.admin_users.create');
     }
 
     /**
