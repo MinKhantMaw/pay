@@ -26,13 +26,15 @@
             <div class="col-md-6 col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <table class="table" id="admin-user">
+                        <table class="table table-bordered" id="admin-user">
                             <thead>
                                 <tr class="bg-light">
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
+                                    <th>IP</th>
+                                    <th>User Agent</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -68,6 +70,14 @@
                     {
                         data: 'phone',
                         name: 'phone',
+                    },
+                    {
+                        data: 'ip',
+                        name: 'ip',
+                    },
+                    {
+                        data: 'user_agent',
+                        name: 'user_agent',
                     },
                     {
                         data: 'action',

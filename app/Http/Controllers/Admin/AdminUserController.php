@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\AdminUser;
+use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use App\Http\Controllers\Controller;
@@ -26,12 +27,33 @@ class AdminUserController extends Controller
     {
         $data=AdminUser::query();
         return Datatables::of($data)
+        ->editColumn('user_agent', function ($e) {
+           if($e->user_agent){
+             $agent = new Agent();
+            $agent->setUserAgent($e->user_agent);
+            $device = $agent->device();
+            $platform = $agent->platform();
+            $browser = $agent->browser();
+
+            return '<table class="table">
+             <tbody>
+                <tr><td>Device</td><td>'.$device.'</td></tr> .
+                <tr><td>Platform</td><td>'.$platform.'</td></tr> .
+                <tr><td>Browser</td><td>'.$browser.'</td></tr>
+             </tbody>
+            </table>';
+           }
+
+           return '-';
+
+        })
         ->addColumn('action', function($each) {
             $edit_icon = '<a href="'.route('admin.admin-user.edit',$each->id).'" class="text-warning"><i class="fas fa-edit"></i></a>';
             $delete_icon = '<a href="#" class="text-danger delete" data-id="'.$each->id.'"><i class="fas fa-trash"></i></a>';
 
             return '<div class="action-icon">' . $edit_icon . $delete_icon . '</div>';
         })
+        ->rawColumns(['user_agent', 'action'])
         ->make(true);
     }
 
@@ -117,4 +139,5 @@ class AdminUserController extends Controller
 
         return 'success';
     }
+
 }
