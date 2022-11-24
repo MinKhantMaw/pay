@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="description" content="This is an example dashboard created using build-in elements and components.">
     <meta name="msapplication-tap-highlight" content="no">
-    {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title')</title>
 
     <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
@@ -46,7 +46,9 @@
         </div>
     </div>
     <script type="text/javascript" src="{{ asset('assets/scripts/main.js') }}"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+        integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous">
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
@@ -57,9 +59,39 @@
 
     <script>
         $(document).ready(function() {
-            $('.back-btn').on('click', function() {
-                window.history.go(-1);
-            });
+            let token = document.head.querySelector('meta[name="csrf-token"]');
+            if (token) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF_TOKEN': token.content
+                    }
+                });
+            }
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            @if (session('create'))
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ session('create') }}'
+                })
+            @endif
+
+            @if (session('update'))
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ session('update') }}'
+                })
+            @endif
+
         });
     </script>
 

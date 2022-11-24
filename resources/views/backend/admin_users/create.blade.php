@@ -18,7 +18,8 @@
     <div class="content pt-3">
         <div class="card">
             <div class="card-body">
-                <form action="" method="">
+                @include('backend.layouts.flag')
+                <form action="{{ route('admin.admin-user.store') }}" method="POST" id="create">
                     @csrf
                     <div class="form-group">
                         <label for="">Name</label>
@@ -37,9 +38,8 @@
                         <input type="password" name="password" class="form-control" id="">
                     </div>
                     <div class="d-flex justify-content-center">
-                        <input type="submit" class="btn btn-success mr-2" value="Submit" id="">
-                        <button type="submit" class="btn btn-danger back-btn">Cancel</button>
-
+                        <button type="submit" class="btn btn-success mr-2" id=""> Save </button>
+                        <button type="reset" onclick="history.back()" class="btn btn-danger ">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -48,9 +48,11 @@
 @endsection
 
 @section('scripts')
+    {!! JsValidator::formRequest('App\Http\Requests\StoreAdminUser', '#create') !!}
+
     <script>
         $(document).ready(function() {
-            var table = $('#admin-user').DataTable();
+
         });
     </script>
 @endsection

@@ -16,8 +16,9 @@
 
         </div>
     </div>
-    <div class="">
-        <a href="{{ route('admin.admin-user.create') }}" class="btn btn-primary"><i class="fas fa-plus-circle"></i>create
+    <div class="m3-5">
+        <a href="{{ route('admin.admin-user.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i>
+            create
             new admin</a>
     </div>
     <div class="content pt-3">
@@ -28,9 +29,11 @@
                         <table class="table" id="admin-user">
                             <thead>
                                 <tr class="bg-light">
+                                    <th>#</th>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -51,6 +54,10 @@
                 serverSide: true,
                 ajax: '{{ route('admin.getDatatable') }}',
                 columns: [{
+                        data: 'id',
+                        name: 'id',
+                    },
+                    {
                         data: 'name',
                         name: 'name',
                     },
@@ -62,7 +69,31 @@
                         data: 'phone',
                         name: 'phone',
                     },
+                    {
+                        data: 'action',
+                        name: 'action',
+                    },
                 ]
+            });
+
+            $(document).on('click', '.delete', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure, you want to delete?',
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/admin-user/' + id,
+                            type: 'DELETE',
+                            success: function() {
+                                table.ajax.reload();
+                            }
+                        });
+                    }
+                })
             });
         });
     </script>
