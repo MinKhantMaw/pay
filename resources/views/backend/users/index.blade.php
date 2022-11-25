@@ -1,7 +1,6 @@
 @extends('backend.layouts.app')
-@section('admin-user-index', 'mm-active')
-
-@section('title', 'Admin User List')
+@section('user-index', 'mm-active')
+@section('title', ' User List')
 @section('content')
     <div class="app-page-title">
         <div class="page-title-wrapper">
@@ -10,23 +9,23 @@
                     <i class="pe-7s-users icon-gradient bg-mean-fruit">
                     </i>
                 </div>
-                <div>Admin User Management
+                <div> User Management
                 </div>
             </div>
 
         </div>
     </div>
     <div class="pt-3">
-        <a href="{{ route('admin.admin-user.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i>
+        <a href="{{ route('user.user.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i>
             create
-            new admin</a>
+            new user</a>
     </div>
     <div class="content py-3">
         <div class="row">
             <div class="col-md-6 col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <table class="table table-bordered" id="admin-user">
+                        <table class="table table-bordered" id="user">
                             <thead>
                                 <tr class="bg-light">
                                     <th>Name</th>
@@ -50,14 +49,14 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            var table = $('#admin-user').DataTable({
+            var table = $('#user').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ],
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('admin.getDatatable') }}',
+                ajax: '{{ route('user.getDatatable') }}',
                 columns: [{
                         data: 'name',
                         name: 'name',
@@ -102,7 +101,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '/admin/admin-user/' + id,
+                            url: '/user/user/' + id,
                             type: 'DELETE',
                             success: function() {
                                 table.ajax.reload();
