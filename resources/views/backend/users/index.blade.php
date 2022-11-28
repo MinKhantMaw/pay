@@ -31,8 +31,8 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>IP</th>
-                                    <th>User Agent</th>
+                                    {{-- <th>IP</th>
+                                    <th>User Agent</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -71,24 +71,16 @@
                         name: 'phone',
                     },
                     {
-                        data: 'ip',
-                        name: 'ip',
-                    },
-                    {
-                        data: 'user_agent',
-                        name: 'user_agent',
-                    },
-                    {
                         data: 'action',
                         name: 'action',
                     },
                 ],
-                columnDefs: [{
-                        targets: [0, 1, 2, 3, 4],
-                        sortable: false,
-                    },
+                // columnDefs: [{
+                //         targets: [0, 1, 2, 3, 4],
+                //         sortable: false,
+                //     },
 
-                ]
+                // ],
             });
 
             $(document).on('click', '.delete', function(e) {
@@ -101,7 +93,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '/user/user/' + id,
+                            url: '/admin/user/' + id,
                             type: 'DELETE',
                             success: function() {
                                 table.ajax.reload();

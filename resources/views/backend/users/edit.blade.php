@@ -1,5 +1,5 @@
 @extends('backend.layouts.app')
-@section('admin-user-index', 'mm-active')
+@section('user-index', 'mm-active')
 @section('title', 'Edit Admin User ')
 @section('content')
     <div class="app-page-title">
@@ -19,22 +19,22 @@
         <div class="card">
             <div class="card-body">
                 @include('backend.layouts.flag')
-                <form action="{{ route('admin.admin-user.update', $admin_user->id) }}" method="POST" id="update">
+                <form action="{{ route('user.user.update', $user->id) }}" method="POST" id="update">
                     @csrf
                     @method('PUT')
                     <div class="form-group">
                         <label for="">Name</label>
-                        <input type="text" name="name" value="{{ $admin_user->name }}" class="form-control"
+                        <input type="text" name="name" value="{{ $user->name }}" class="form-control"
                             id="">
                     </div>
                     <div class="form-group">
                         <label for="">Email</label>
-                        <input type="email" name="email" value="{{ $admin_user->email }}" class="form-control"
+                        <input type="email" name="email" value="{{ $user->email }}" class="form-control"
                             id="">
                     </div>
                     <div class="form-group">
                         <label for="">Phone</label>
-                        <input type="phone" name="phone" value="{{ $admin_user->phone }}" class="form-control"
+                        <input type="phone" name="phone" value="{{ $user->phone }}" class="form-control"
                             id="">
                     </div>
                     <div class="form-group">
@@ -52,7 +52,7 @@
 @endsection
 
 @section('scripts')
-    {!! JsValidator::formRequest('App\Http\Requests\UpdateAdminUser', '#update') !!}
+    {!! JsValidator::formRequest('App\Http\Requests\UpdateUser', '#update') !!}
 
     <script>
         $(document).ready(function() {

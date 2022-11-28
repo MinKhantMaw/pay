@@ -1,6 +1,6 @@
 @extends('backend.layouts.app')
-@section('admin-user-index', 'mm-active')
-@section('title', 'Create Admin User ')
+@section('user-index', 'mm-active')
+@section('title', 'Create User ')
 @section('content')
     <div class="app-page-title">
         <div class="page-title-wrapper">
@@ -9,7 +9,7 @@
                     <i class="pe-7s-users icon-gradient bg-mean-fruit">
                     </i>
                 </div>
-                <div>Admin User Management
+                <div> User Management
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
         <div class="card">
             <div class="card-body">
                 @include('backend.layouts.flag')
-                <form action="{{ route('admin.admin-user.store') }}" method="POST" id="create">
+                <form action="{{ route('user.user.store') }}" method="POST" id="create">
                     @csrf
                     <div class="form-group">
                         <label for="">Name</label>
@@ -48,7 +48,7 @@
 @endsection
 
 @section('scripts')
-    {!! JsValidator::formRequest('App\Http\Requests\StoreAdminUser', '#create') !!}
+    {!! JsValidator::formRequest('App\Http\Requests\StoreUser', '#create') !!}
 
     <script>
         $(document).ready(function() {
