@@ -8,6 +8,6 @@ class PageController extends Controller
 {
     public function index()
     {
-        return view('auth.admin_login');
+        return view('frontend.home');
     }
 }

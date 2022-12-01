@@ -31,8 +31,9 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    {{-- <th>IP</th>
-                                    <th>User Agent</th> --}}
+                                    <th>IP</th>
+                                    <th>User Agent</th>
+                                    <th>Login At</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -71,16 +72,28 @@
                         name: 'phone',
                     },
                     {
+                        data: 'ip',
+                        name: 'ip',
+                    },
+                    {
+                        data: 'user_agent',
+                        name: 'user_agent',
+                    },
+                    {
+                        data: 'login_at',
+                        name: 'login_at',
+                    },
+                    {
                         data: 'action',
                         name: 'action',
                     },
                 ],
-                // columnDefs: [{
-                //         targets: [0, 1, 2, 3, 4],
-                //         sortable: false,
-                //     },
+                columnDefs: [{
+                        targets: [0, 1, 2, 3, 4],
+                        sortable: false,
+                    },
 
-                // ],
+                ],
             });
 
             $(document).on('click', '.delete', function(e) {

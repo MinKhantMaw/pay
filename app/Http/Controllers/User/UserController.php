@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\User;
+use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUser;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUser;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -26,14 +27,33 @@ class UserController extends Controller
     {
         $users = User::query();
         return DataTables::of($users)
-        ->addColumn('action', function($each) {
-            $edit_icon = '<a href="'.route('user.user.edit',$each->id).'" class="text-warning"><i class="fas fa-edit"></i></a>';
-            $delete_icon = '<a href="#" class="text-danger delete" data-id="'.$each->id.'"><i class="fas fa-trash"></i></a>';
+            ->editColumn('user_agent', function ($e) {
+                if ($e->user_agent) {
+                    $agent = new Agent();
+                    $agent->setUserAgent($e->user_agent);
+                    $device = $agent->device();
+                    $platform = $agent->platform();
+                    $browser = $agent->browser();
 
-            return '<div class="action-icon">' . $edit_icon . $delete_icon . '</div>';
-        })
-        ->rawColumns(['user_agent', 'action'])
-        ->make(true);
+                    return '<table class="table">
+             <tbody>
+                <tr><td>Device</td><td>' . $device . '</td></tr> .
+                <tr><td>Platform</td><td>' . $platform . '</td></tr> .
+                <tr><td>Browser</td><td>' . $browser . '</td></tr>
+             </tbody>
+            </table>';
+                }
+
+                return '-';
+            })
+            ->addColumn('action', function ($each) {
+                $edit_icon = '<a href="' . route('user.user.edit', $each->id) . '" class="text-warning"><i class="fas fa-edit"></i></a>';
+                $delete_icon = '<a href="#" class="text-danger delete" data-id="' . $each->id . '"><i class="fas fa-trash"></i></a>';
+
+                return '<div class="action-icon">' . $edit_icon . $delete_icon . '</div>';
+            })
+            ->rawColumns(['user_agent', 'action'])
+            ->make(true);
     }
 
     /**
@@ -83,7 +103,7 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('backend.users.edit',compact('user'));
+        return view('backend.users.edit', compact('user'));
     }
 
     /**
@@ -95,12 +115,12 @@ class UserController extends Controller
      */
     public function update(UpdateUser $request, $id)
     {
-      $user = User::findOrFail($id);
-      $user->name = $request->name;
-      $user->email = $request->email;
-      $user->phone = $request->phone;
-      $user->update();
-      return redirect()->route('user.user.index')->with('update','User was Successfully Update');
+        $user = User::findOrFail($id);
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->update();
+        return redirect()->route('user.user.index')->with('update', 'User was Successfully Update');
     }
 
     /**
