@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\User;
+use App\Models\Wallet;
 use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUser;
 use App\Http\Requests\UpdateUser;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\Facades\DataTables;
@@ -74,13 +76,36 @@ class UserController extends Controller
      */
     public function store(StoreUser $request)
     {
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-        ]);
-        return redirect()->route('user.user.index')->with('create', 'User Successfully Created');
+
+        DB::beginTransaction();
+        try {
+
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->password = Hash::make($request->password);
+
+            $user->save();
+
+            Wallet::firstOrCreate(
+
+                [
+                    'user_id' => $user->id,
+                ],
+
+                [
+                    'account_number' => '1234123412341234',
+                    'amount' => 0,
+                ]
+
+            );
+            DB::commit();
+            return redirect()->route('user.user.index')->with('create', 'Successfully Created');
+        } catch (\Exception $err) {
+            DB::rollBack();
+            return back()->withErrors(['fails' => 'Account Create not success !'])->withInput();
+        }
     }
 
     /**
