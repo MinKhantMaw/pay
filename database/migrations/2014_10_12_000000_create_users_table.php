@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('ip')->nullable();
             $table->string('user_agent')->nullable();
+            $table->string('login_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
