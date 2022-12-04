@@ -167,7 +167,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             //throw $e;
             DB::rollBack();
-            return back()->withErrors(['fails' => 'This Account is already exit  !'])->withInput();
+            return back()->withErrors(['fails' => 'This Account is already exit...!' . $e->getMessage()])->withInput();
         }
     }
 
