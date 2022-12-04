@@ -51,6 +51,12 @@
                         </i> Users
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('wallet.index') }}" class="@yield('wallet-index')">
+                        <i class="metismenu-icon pe-7s-wallet">
+                        </i> Wallet Management
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

@@ -63,6 +63,7 @@
 
     <!-- Laravel Javascript Validation -->
     <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js') }}"></script>
+
     {{-- sweet alert cdn --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -27,6 +27,11 @@ class User extends Authenticatable
         'password',
     ];
 
+    public function wallet()
+    {
+        return $this->hasOne(Walker::class, 'user_id', 'id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

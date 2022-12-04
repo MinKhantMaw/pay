@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Helpers\WalletGenerate;
 use App\Models\User;
 use App\Models\Wallet;
 use Jenssegers\Agent\Agent;
@@ -95,7 +96,7 @@ class UserController extends Controller
                 ],
 
                 [
-                    'account_number' => '1234123412341234',
+                    'account_number' => WalletGenerate::accountNumber(),
                     'amount' => 0,
                 ]
 
@@ -140,12 +141,34 @@ class UserController extends Controller
      */
     public function update(UpdateUser $request, $id)
     {
-        $user = User::findOrFail($id);
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->update();
-        return redirect()->route('user.user.index')->with('update', 'User was Successfully Update');
+        DB::beginTransaction();
+        try {
+            //code...
+            $user = User::findOrFail($id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->update();
+
+            Wallet::firstOrCreate(
+
+                [
+                    'user_id' => $user->id,
+                ],
+
+                [
+                    'account_number' => WalletGenerate::accountNumber(),
+                    'amount' => 0,
+                ]
+
+            );
+            DB::commit();
+            return redirect()->route('user.user.index')->with('update', 'User was Successfully Update');
+        } catch (\Exception $e) {
+            //throw $e;
+            DB::rollBack();
+            return back()->withErrors(['fails' => 'This Account is already exit  !'])->withInput();
+        }
     }
 
     /**
