@@ -4,9 +4,7 @@
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height: 100vh">
             <div class="col-md-6">
-                <div class="card">
-
-
+                <div class="card auth-form">
                     <div class="card-body">
                         <h3 class="text-center">Login</h3>
                         <form method="POST" action="{{ route('login') }}">
@@ -32,13 +30,13 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-block my-3">Login</button>
+                            <button type="submit" class="btn btn-primary btn-block my-3 btn-theme">Login</button>
 
                             <div class="row">
                                 <div class="d-flex justify-content-between">
-                                    <a href="{{ route('register') }}" class="">Sign Up.</a>
+                                    <a href="{{ route('register') }}" class="text-decoration-none">Sign Up.</a>
                                     @if (Route::has('password.request'))
-                                        <a href="{{ route('password.request') }}">
+                                        <a href="{{ route('password.request') }}" class="text-decoration-none">
                                             {{ __('Forgot Your Password?') }}
                                         </a>
                                     @endif
