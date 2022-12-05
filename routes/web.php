@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
-Route::controller(PageController::class)->group(function () {
+Route::middleware('auth')->controller(PageController::class)->group(function () {
     Route::get('/', 'index');
 });
 

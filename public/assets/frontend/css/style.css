@@ -1,13 +1,32 @@
+body{
+    background: #EDEDF5;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+
+/* Auth Section */
 .auth-form{
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     border: none;
     border-radius: 10px;
 }
 .btn-theme{
-    background: #5799da;
+    background: #5842E3;
     border: none;
 }
 
 .btn-theme:hover{
-    background: #5799da;
+    background: #5842E3;
+}
+
+
+/* ------Bottom Menu --------- */
+
+.bottom-menu{
+    background: #fff;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
