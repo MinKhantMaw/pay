@@ -1,24 +1,22 @@
-body{
-    background: #EDEDF5;
+body {
+    background: #ededf5;
     font-size: 15px;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
-
-
 /* Auth Section */
-.auth-form{
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+.auth-form {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     border: none;
     border-radius: 10px;
 }
-.btn-theme{
-    background: #5842E3;
+.btn-theme {
+    background: #5842e3;
     border: none;
 }
 
-.btn-theme:hover{
-    background: #5842E3;
+.btn-theme:hover {
+    background: #5842e3;
 }
 
 /* ------------header menu ------------ */
@@ -40,7 +38,7 @@ body{
 }
 
 .header-menu a:hover {
-    color: #5842E3;
+    color: #5842e3;
     transition: 0.3;
 }
 
@@ -53,20 +51,20 @@ body{
     font-size: 20px;
 }
 
-
 /* ------Bottom Menu --------- */
 
-.bottom-menu a{
+.bottom-menu a {
     text-decoration: none;
     color: #333;
+    display: block;
 }
 
 .bottom-menu a:hover {
-   color: #5842E3;
-   transition: 0.3;
+    color: #5842e3;
+    transition: 0.3;
 }
 
-.bottom-menu{
+.bottom-menu {
     background: #fff;
     position: fixed;
     bottom: 0;
@@ -74,7 +72,7 @@ body{
     right: 0;
 }
 
-.bottom-menu i{
+.bottom-menu i {
     margin-top: 12px;
     font-size: 20px;
 }
@@ -83,7 +81,24 @@ body{
 }
 
 /* ---------Main Content---------- */
-.content{
+.content {
     margin-top: 75px;
     margin-bottom: 75px;
+}
+
+/* ------Profile------- */
+.account {
+    text-align: center;
+}
+
+.account profile {
+}
+
+.account profile img {
+    width: 100px;
+    height: 100px;
+}
+
+.avatar {
+    border-radius: 100%;
 }
