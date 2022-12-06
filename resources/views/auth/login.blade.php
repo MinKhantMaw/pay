@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height: 100vh">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="card auth-form">
                     <div class="card-body">
                         <h3 class="text-center">Login</h3>
@@ -30,7 +30,8 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-block my-3 btn-theme">Login</button>
+                            <button type="submit" class="btn btn-primary btn-block my-3 btn-theme"
+                                style="width:100%">Login</button>
 
                             <div class="row">
                                 <div class="d-flex justify-content-between">

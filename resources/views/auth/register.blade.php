@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height:100vh;">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="card auth-form">
                     {{-- <div class="card-header">{{ __('Register') }}</div> --}}
                     <div class="card-body">
@@ -68,9 +68,10 @@
                                 @enderror
                             </div>
 
-                            <div class="form-group my-3 d-flex justify-content-between">
-                                <button type="submit" class="btn btn-primary btn-theme">Register</button>
-                                <a href="{{ route('login') }}" class="text-decoration-none mt-1">Already have an
+                            <div class="form-group my-3 ">
+                                <button type="submit" class="btn btn-primary btn-theme"
+                                    style="width:100%">Register</button>
+                                <a href="{{ route('login') }}" class="text-decoration-none">Already have an
                                     account?</a>
                             </div>
                         </form>
