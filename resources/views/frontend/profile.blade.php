@@ -32,7 +32,7 @@
                     <span class="mr-3"><i class="fas fa-angle-right"></i></span>
                 </div>
                 <hr>
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between logout">
                     <span>Logout</span>
                     <span class="mr-3"><i class="fas fa-angle-right"></i></span>
                 </div>
@@ -40,4 +40,31 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.logout', function(e) {
+                e.preventDefault();
+                // var id = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure, you want to delete?',
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('logout') }}",
+                            type: 'POST',
+                            success: function() {
+
+                            }
+                        });
+                        window.location.reload();
+                    }
+                })
+            });
+        });
+    </script>
 @endsection
