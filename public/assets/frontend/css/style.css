@@ -99,11 +99,56 @@ body {
     height: 100px;
     border-radius: 100%;
     padding: 5px;
-    border: 1px solid #ddd;Username
+    border: 1px solid #ddd;
     background: #fff;
 }
 
 .account .card {
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logout {
+    text-decoration: none;
+    color: #333;
+}
+
+.logout:hover {
+    text-decoration: none;
+    color: #5842e3;
+}
+
+.swal2-popup {
+    border-radius: 10px !important;
+}
+.swal2-title {
+    font-size: 22px !important;
+}
+
+.swal2-styled {
+    padding: 10px 25px !important;
+    border-radius: 10px !important;
+}
+
+.swal2-styled .swal2-confirm {
+    background: #5842e3 !important;
+}
+
+.update-password {
+    text-decoration: none;
+    color: #333;
+}
+
+.update-password :hover {
+    cursor: pointer;
+    text-decoration: none;
+    color: #5842e3;
+}
+
+.update_password img {
+    width: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }

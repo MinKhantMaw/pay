@@ -17,4 +17,9 @@ class PageController extends Controller
         $user = Auth::guard('web')->user();
         return view('frontend.profile', ['user' => $user]);
     }
+
+    public function updatePassword()
+    {
+        return view('frontend.update_password');
+    }
 }

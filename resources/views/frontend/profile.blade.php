@@ -2,7 +2,7 @@
 @section('title', 'Profile')
 @section('content')
     <div class="account">
-        <div class="profile">
+        <div class="profile mb-3">
             <img src="https://ui-avatars.com/api/?background=5842E3&color=fff&name=Min+Khant" class="avatar" alt="">
         </div>
 
@@ -27,15 +27,17 @@
 
         <div class="card mb-3">
             <div class="card-body pr-0">
-                <div class="d-flex justify-content-between">
+                <a href="{{ route('updatePassword') }}" class="d-flex justify-content-between update-password">
                     <span>Update Password</span>
-                    <span class="mr-3"><i class="fas fa-angle-right"></i></span>
-                </div>
+                    <span class="mr-3">
+                        <i class="fas fa-angle-right"></i>
+                    </span>
+                </a>
                 <hr>
-                <div class="d-flex justify-content-between logout">
+                <a href="#" class="d-flex justify-content-between logout">
                     <span>Logout</span>
                     <span class="mr-3"><i class="fas fa-angle-right"></i></span>
-                </div>
+                </a>
                 <hr>
             </div>
         </div>
@@ -51,6 +53,7 @@
                 Swal.fire({
                     title: 'Are you sure, you want to delete?',
                     showCancelButton: true,
+                    reverseButtons: true,
                     confirmButtonText: `Confirm`,
                 }).then((result) => {
                     if (result.isConfirmed) {

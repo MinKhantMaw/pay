@@ -11,6 +11,7 @@ Auth::routes();
 Route::middleware('auth')->controller(PageController::class)->group(function () {
     Route::get('/', 'index')->name('home');
     Route::get('/prfile', 'profile')->name('profile');
+    Route::get('/update-password', 'updatePassword')->name('updatePassword');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {
