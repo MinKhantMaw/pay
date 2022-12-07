@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class PageController extends Controller
 {
@@ -13,6 +14,7 @@ class PageController extends Controller
 
     public function profile()
     {
-        return view('frontend.profile');
+        $user = Auth::guard('web')->user();
+        return view('frontend.profile', ['user' => $user]);
     }
 }
