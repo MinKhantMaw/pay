@@ -94,6 +94,8 @@
 
     {{-- sweet alert cdn --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Laravel Javascript Validation -->
+    <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js') }}"></script>
 
     <script>
         $(document).ready(function() {
@@ -107,6 +109,30 @@
                     }
                 });
             }
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            @if (session('create'))
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ session('create') }}'
+                })
+            @endif
+
+            @if (session('update'))
+                Toast.fire({
+                    icon: 'success',
+                    title: '{{ session('update') }}'
+                })
+            @endif
         });
     </script>
     @yield('scripts')
