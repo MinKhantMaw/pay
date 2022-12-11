@@ -49,7 +49,7 @@ body {
 }
 
 .header-menu h3 {
-    font-size: 22px;
+    font-size: 20px;
     margin-bottom: 0;
 }
 
@@ -80,7 +80,7 @@ body {
 
 .bottom-menu i {
     margin-top: 12px;
-    font-size: 20px;
+    font-size: 18px;
 }
 .bottom-menu p {
     font-size: 12px;
@@ -157,4 +157,33 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+
+/* ------------scan tab ----------------- */
+.scan-tab {
+    width: 60px;
+    height: 60px;
+    background: #ededf5;
+    border-radius: 100px;
+    position: fixed;
+    bottom: 40px;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+.scan-tab .inside {
+    width: 52px;
+    height: 52px;
+    background: #fff;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scan-tab .inside i {
+    margin: 0;
 }
