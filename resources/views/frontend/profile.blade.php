@@ -3,7 +3,8 @@
 @section('content')
     <div class="account">
         <div class="profile mb-3">
-            <img src="https://ui-avatars.com/api/?background=5842E3&color=fff&name=Min+Khant" class="avatar" alt="">
+            <img src="https://ui-avatars.com/api/?background=5842E3&color=fff&name={{ auth()->user()->name }}" class="avatar"
+                alt="">
         </div>
 
         <div class="card mb-3">

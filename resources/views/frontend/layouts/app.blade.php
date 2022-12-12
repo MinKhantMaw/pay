@@ -73,7 +73,7 @@
                             </a>
                         </div>
                         <div class="col-3 text-center">
-                            <a href="">
+                            <a href="{{ route('wallet') }}">
                                 <i class="fa-sharp fa-solid fa-wallet"></i>
                                 <p>Wallet</p>
                             </a>

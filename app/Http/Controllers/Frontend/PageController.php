@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePassword;
+use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,7 +13,8 @@ class PageController extends Controller
 {
     public function index()
     {
-        return view('frontend.home');
+        $user = Auth::guard('web')->user();
+        return view('frontend.home', ['user' => $user]);
     }
 
     public function profile()
@@ -41,5 +43,12 @@ class PageController extends Controller
         }
 
         return back()->withErrors(['old_password' => 'The old password was incorrect'])->withInput();
+    }
+
+    public function wallet()
+    {
+        $auth_user = auth()->guard('web')->user();
+        // return $auth_user;
+        return view('frontend.wallet', ['auth_user' => $auth_user]);
     }
 }

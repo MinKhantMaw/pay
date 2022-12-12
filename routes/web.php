@@ -13,6 +13,7 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('/prfile', 'profile')->name('profile');
     Route::get('/update-password', 'updatePassword')->name('updatePassword');
     Route::post('/update-password', 'updatePasswordStore')->name('updatePasswordStore');
+    Route::get('/wallet', 'wallet')->name('wallet');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {
