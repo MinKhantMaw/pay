@@ -15,6 +15,7 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::post('/update-password', 'updatePasswordStore')->name('updatePasswordStore');
     Route::get('/wallet', 'wallet')->name('wallet');
     Route::get('/transfers', 'transfer')->name('transfer');
+    Route::post('/transfers/confirm', 'transferConfirm')->name('transferConfirm');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {

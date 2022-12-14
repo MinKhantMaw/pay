@@ -1,30 +1,29 @@
 @extends('frontend.layouts.app')
-@section('title', 'Transfer')
+@section('title', 'Transfer Confirmation')
 @section('content')
     <div class="transfer">
-        <div class="card">
+        <div class="card mt-1">
             <div class="card-body">
-                <form action="{{ route('transferConfirm') }}" method="POST">
+                <form action="" method="">
                     @csrf
                     <div class="form-group">
-                        <label class="mb-1">From</label>
+                        <label class="mb-0"><strong>From</strong></label>
                         <p class="mb-1 text-muted">{{ $auth_user->name }}</p>
-                        <p class="mb-1 text-muted">{{ $auth_user->phone }}</p>
                     </div>
 
                     <div class="form-group">
-                        <label for="to">To</label>
-                        <input type="text" class="form-control" name="to_phone">
+                        <label class="mb-0"><strong>Phone</strong></label>
+                        <p class="mb-1 text-muted">{{ $to_phone }}</p>
                     </div>
 
                     <div class="form-group">
-                        <label for="to">Amount (MMK)</label>
-                        <input type="number" class="form-control" name="amount">
+                        <label class="mb-0"><strong>Amount (MMK)</strong></label>
+                        <p class="mb-1 text-muted">{{ number_format($amount) }}</p>
                     </div>
 
                     <div class="form-group">
-                        <label for="to">Description</label>
-                        <textarea name="" id="" class="form-control"></textarea>
+                        <label class="mb-0"><strong>Description</strong></label>
+                        <p class="mb-1 text-muted">{{ $description }}</p>
                     </div>
                     <button type="submit" class="btn btn-theme btn-block mt-5 text-white"
                         style="width: 100%">Continue</button>

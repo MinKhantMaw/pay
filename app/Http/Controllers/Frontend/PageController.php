@@ -54,6 +54,16 @@ class PageController extends Controller
 
     public function transfer()
     {
-        return view('frontend.transfer');
+        $auth_user = auth()->guard('web')->user();
+        return view('frontend.transfer', ['auth_user' => $auth_user]);
+    }
+
+    public function transferConfirm(Request $request)
+    {
+        $auth_user = auth()->guard('web')->user();
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        return view('frontend.transfer_confirm', ['auth_user' => $auth_user, 'to_phone' => $to_phone, 'amount' => $amount, 'description' => $description]);
     }
 }
