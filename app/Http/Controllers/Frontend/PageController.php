@@ -51,4 +51,9 @@ class PageController extends Controller
         // return $auth_user;
         return view('frontend.wallet', ['auth_user' => $auth_user]);
     }
+
+    public function transfer()
+    {
+        return view('frontend.transfer');
+    }
 }

@@ -246,8 +246,8 @@ body {
 }
 
 .profile img {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 100%;
     padding: 5px;
     border: 1px solid #ddd;
@@ -257,7 +257,14 @@ body {
 /* ------Home page ---- */
 
 .shortcut-box img {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
+    margin-right: 15px;
+}
+
+/* ----function box ----- */
+.function-box img {
+    width: 28px;
+    height: 28px;
     margin-right: 15px;
 }
