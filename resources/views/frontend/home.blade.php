@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="col-12">
-                <div class="card mb-3 function-box">
+                <div class="card mb-3 function-box m-2">
                     <div class="card-body pr-0">
                         <a href="{{ route('transfer') }}" class="d-flex justify-content-between update-password">
                             <span> <img src="{{ asset('img/money-transfer.png') }}" alt=""> Transfer</span>

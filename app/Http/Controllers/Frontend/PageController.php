@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdatePassword;
-use App\Models\Wallet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\UpdatePassword;
+use App\Http\Requests\TransferFormValidate;
 
 class PageController extends Controller
 {
@@ -58,8 +60,17 @@ class PageController extends Controller
         return view('frontend.transfer', ['auth_user' => $auth_user]);
     }
 
-    public function transferConfirm(Request $request)
+    public function transferConfirm(TransferFormValidate $request)
     {
+        if ($request->amount > 1000) {
+            return back()->withErrors(['amount' => 'The amount must be greanter than 1000 MMK'])->withInput();
+        }
+
+        $check_to = User::where('phone', $request->to_phone)->first();
+        if (!$check_to) {
+            return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
+        }
+
         $auth_user = auth()->guard('web')->user();
         $to_phone = $request->to_phone;
         $amount = $request->amount;

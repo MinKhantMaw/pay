@@ -14,12 +14,26 @@
 
                     <div class="form-group">
                         <label for="to">To</label>
-                        <input type="text" class="form-control" name="to_phone">
+                        <input type="number"
+                            class="form-control @error('to_phone')
+                            is-invalid
+                        @enderror"
+                            name="to_phone" autocomplete="off">
+                        @error('to_phone')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <label for="to">Amount (MMK)</label>
-                        <input type="number" class="form-control" name="amount">
+                        <input type="number"
+                            class="form-control @error('amount')
+                            is-invalid
+                        @enderror"
+                            name="amount" autocomplete="off">
+                        @error('amount')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
@@ -35,5 +49,7 @@
 @endsection
 
 @section('scripts')
+    {{-- {!! JsValidator::formRequest('App\Http\Requests\TransferFormValidate', '#transfer') !!} --}}
+
     <script></script>
 @endsection
