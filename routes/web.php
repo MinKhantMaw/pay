@@ -16,6 +16,7 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('/wallet', 'wallet')->name('wallet');
     Route::get('/transfers', 'transfer')->name('transfer');
     Route::post('/transfers/confirm', 'transferConfirm')->name('transferConfirm');
+    Route::get('/to-account-verify', 'toAccountVerify')->name('toAccountVerify');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {

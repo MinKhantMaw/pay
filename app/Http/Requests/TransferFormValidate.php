@@ -32,8 +32,8 @@ class TransferFormValidate extends FormRequest
     public function message()
     {
         return [
-            'to_phone.required' => 'The phone number is required.',
-            'amount' => 'The amount is required.',
+            'to_phone.required' => 'Please fill the to account information .',
+            'amount' => ' Please fill the amount is required.',
         ];
     }
 }

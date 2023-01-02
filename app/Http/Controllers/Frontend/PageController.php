@@ -62,8 +62,8 @@ class PageController extends Controller
 
     public function transferConfirm(TransferFormValidate $request)
     {
-        if ($request->amount > 1000) {
-            return back()->withErrors(['amount' => 'The amount must be greanter than 1000 MMK'])->withInput();
+        if ($request->amount < 1000) {
+            return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
         }
 
         $check_to = User::where('phone', $request->to_phone)->first();
@@ -76,5 +76,11 @@ class PageController extends Controller
         $amount = $request->amount;
         $description = $request->description;
         return view('frontend.transfer_confirm', ['auth_user' => $auth_user, 'to_phone' => $to_phone, 'amount' => $amount, 'description' => $description]);
+    }
+
+    public function toAccountVerify(Request $request)
+    {
+        $user = User::where('phone', $request->phone)->first();
+        return $user;
     }
 }

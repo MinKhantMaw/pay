@@ -13,12 +13,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="to">To</label>
-                        <input type="number"
-                            class="form-control @error('to_phone')
+
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="to">To <span class="to_account_info to_phone"></span></label>
+                        <div class="input-group mb-3">
+                            <input type="number" value="{{ old('to_phone') }}"
+                                class="form-control @error('to_phone')
                             is-invalid
                         @enderror"
-                            name="to_phone" autocomplete="off">
+                                name="to_phone" autocomplete="off">
+                            <div class="input-group-append">
+                                <span class="input-group-text btn btn-theme verify-btn" style="display: block"
+                                    id="basic-addon2"><i class="fas fa-check-circle" style="color: white;"></i></span>
+                            </div>
+                        </div>
                         @error('to_phone')
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -26,7 +37,7 @@
 
                     <div class="form-group">
                         <label for="to">Amount (MMK)</label>
-                        <input type="number"
+                        <input type="number" value="{{ old('amount') }}"
                             class="form-control @error('amount')
                             is-invalid
                         @enderror"
@@ -38,7 +49,7 @@
 
                     <div class="form-group">
                         <label for="to">Description</label>
-                        <textarea name="" id="" class="form-control"></textarea>
+                        <textarea name="" id="" class="form-control">{{ old('message') }}</textarea>
                     </div>
                     <button type="submit" class="btn btn-theme btn-block mt-5 text-white"
                         style="width: 100%">Continue</button>
@@ -51,5 +62,18 @@
 @section('scripts')
     {{-- {!! JsValidator::formRequest('App\Http\Requests\TransferFormValidate', '#transfer') !!} --}}
 
-    <script></script>
+    <script>
+        $('document').ready(function() {
+            $('.verify-btn').on('click', function() {
+                var phone = $('.to_phone').val();
+                $.ajax({
+                    url: '/to-account-verify?phone=' + phone,
+                    type: 'GET',
+                    success: function(res) {
+
+                    }
+                })
+            });
+        })
+    </script>
 @endsection
