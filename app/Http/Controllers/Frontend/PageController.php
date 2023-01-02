@@ -80,7 +80,20 @@ class PageController extends Controller
 
     public function toAccountVerify(Request $request)
     {
-        $user = User::where('phone', $request->phone)->first();
-        return $user;
+        $authUser = auth()->guard('web')->user();
+        if ($authUser->phone != $request->phone) {
+            $user = User::where('phone', $request->phone)->first();
+            if ($user) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'success',
+                    'data' => $user,
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'Invalid phone number',
+        ]);
     }
 }

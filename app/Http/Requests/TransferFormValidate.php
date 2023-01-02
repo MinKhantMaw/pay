@@ -29,11 +29,11 @@ class TransferFormValidate extends FormRequest
         ];
     }
 
-    public function message()
+    public function messages()
     {
         return [
             'to_phone.required' => 'Please fill the to account information .',
-            'amount' => ' Please fill the amount is required.',
+            'amount.required' => ' Please fill the amount is required.',
         ];
     }
 }

@@ -18,10 +18,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="to">To <span class="to_account_info to_phone"></span></label>
-                        <div class="input-group mb-3">
+                        <label for="to">To <span class="text-success to_account_info"></span></label>
+                        <div class="input-group">
                             <input type="number" value="{{ old('to_phone') }}"
-                                class="form-control @error('to_phone')
+                                class="form-control rounded to_phone @error('to_phone')
                             is-invalid
                         @enderror"
                                 name="to_phone" autocomplete="off">
@@ -70,10 +70,14 @@
                     url: '/to-account-verify?phone=' + phone,
                     type: 'GET',
                     success: function(res) {
-
+                        if (res.status == 'success') {
+                            $('.to_account_info').text('(' + res.data['name'] + ')');
+                        } else {
+                            $('.to_account_info').text('(' + res.message + ')');
+                        }
                     }
-                })
+                });
             });
-        })
+        });
     </script>
 @endsection
