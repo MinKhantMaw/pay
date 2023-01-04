@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Helpers\WalletGenerate;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use function GuzzleHttp\Promise\all;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+
 use App\Http\Requests\UpdatePassword;
 use App\Http\Requests\TransferFormValidate;
+use App\Models\Transaction;
 
 class PageController extends Controller
 {
@@ -66,16 +71,104 @@ class PageController extends Controller
             return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
         }
 
-        $check_to = User::where('phone', $request->to_phone)->first();
-        if (!$check_to) {
+        $auth_user = auth()->guard('web')->user();
+        if ($auth_user->phone == $request->to_phone) {
+            return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
+        }
+
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
             return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
         }
 
-        $auth_user = auth()->guard('web')->user();
-        $to_phone = $request->to_phone;
+
+        $from_account = $auth_user;
         $amount = $request->amount;
         $description = $request->description;
-        return view('frontend.transfer_confirm', ['auth_user' => $auth_user, 'to_phone' => $to_phone, 'amount' => $amount, 'description' => $description]);
+        return view('frontend.transfer_confirm', ['from_account' => $from_account, 'to_account' => $to_account, 'amount' => $amount, 'description' => $description]);
+    }
+
+    public function transferComplete(TransferFormValidate $request)
+    {
+        // return $request->all();
+        $auth_user = auth()->guard('web')->user();
+        if ($auth_user->phone == $request->to_phone) {
+            return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
+        }
+
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
+            return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
+        }
+
+
+        $from_account = $auth_user;
+        $amount = $request->amount;
+        $description = $request->description;
+
+        if (!$from_account->wallet || !$to_account->wallet) {
+            return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
+        }
+
+        DB::beginTransaction();
+        try {
+            $from_account_wallet = $from_account->wallet;
+            $from_account_wallet->decrement('amount', $amount);
+            $from_account_wallet->update();
+
+            $to_account_wallet = $to_account->wallet;
+            $to_account_wallet->increment('amount', $amount);
+            $to_account_wallet->update();
+
+            $ref_no = WalletGenerate::refNumber();
+
+            $from_account_transaction = new Transaction();
+            $from_account_transaction->ref_no = $ref_no;
+            $from_account_transaction->trx_id = WalletGenerate::trxId();
+            $from_account_transaction->user_id = $from_account->id;
+            $from_account_transaction->type = 2;
+            $from_account_transaction->amount = $amount;
+            $from_account_transaction->source_id = $to_account->id;
+            $from_account_transaction->description = $description;
+            $from_account_transaction->save();
+
+            $to_account_transaction = new Transaction();
+            $to_account_transaction->ref_no = $ref_no;
+            $to_account_transaction->trx_id = WalletGenerate::trxId();
+            $to_account_transaction->user_id = $to_account->id;
+            $to_account_transaction->type = 1;
+            $to_account_transaction->amount = $amount;
+            $to_account_transaction->source_id = $from_account->id;
+            $to_account_transaction->description = $description;
+            $to_account_transaction->save();
+
+            DB::commit();
+            return redirect('/')->with('transfer_success', 'Successfully transferred');
+        } catch (\Exception  $error) {
+            DB::rollBack();
+            return back()->withErrors(['fail' => 'Something was wrong.' . $error->getMessage()])->withInput();
+        }
+    }
+
+    public function passwordCheck(Request $request)
+    {
+        if (!$request->password) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Please enter a password',
+            ]);
+        }
+        $user = auth()->user();
+        if (Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'The password is correct',
+            ]);
+        }
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'The password is incorrect',
+        ]);
     }
 
     public function toAccountVerify(Request $request)

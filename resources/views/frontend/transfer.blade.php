@@ -4,7 +4,8 @@
     <div class="transfer">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('transferConfirm') }}" method="POST">
+
+                <form action="{{ route('transferConfirm') }}" method="GET">
                     @csrf
                     <div class="form-group">
                         <label class="mb-1">From</label>

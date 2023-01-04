@@ -14,9 +14,12 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('/update-password', 'updatePassword')->name('updatePassword');
     Route::post('/update-password', 'updatePasswordStore')->name('updatePasswordStore');
     Route::get('/wallet', 'wallet')->name('wallet');
+
     Route::get('/transfers', 'transfer')->name('transfer');
-    Route::post('/transfers/confirm', 'transferConfirm')->name('transferConfirm');
+    Route::get('/transfers/confirm', 'transferConfirm')->name('transferConfirm');
     Route::get('/to-account-verify', 'toAccountVerify')->name('toAccountVerify');
+    Route::post('/transfers/complete', 'transferComplete')->name('transferComplete');
+    Route::get('/transfers/confirm/password-check', 'passwordCheck')->name('passwordCheck');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {
