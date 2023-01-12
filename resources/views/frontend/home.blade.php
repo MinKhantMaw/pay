@@ -42,7 +42,7 @@
                             <span class="mr-3"><i class="fas fa-angle-right"></i></span>
                         </a>
                         <hr>
-                        <a href="#" class="d-flex justify-content-between logout">
+                        <a href="{{ route('transactions') }}" class="d-flex justify-content-between logout">
                             <span> <img src="{{ asset('img/money-transfer (1).png') }}" alt=""> Transaction</span>
                             <span class="mr-3"><i class="fas fa-angle-right"></i></span>
                         </a>

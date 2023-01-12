@@ -79,7 +79,7 @@
                             </a>
                         </div>
                         <div class="col-3 text-center">
-                            <a href="">
+                            <a href="{{ route('transactions') }}">
                                 <i class="fa-solid fa-money-bill-transfer"></i>
                                 <p>Transaction</p>
                             </a>

@@ -150,6 +150,34 @@ class PageController extends Controller
         }
     }
 
+    public function transactions()
+    {
+        $authUser = auth()->user();
+        $transactions = Transaction::where('user_id', $authUser->id)->paginate(5);
+        return view('frontend.transactions', ['transactions' => $transactions]);
+    }
+
+
+
+    public function toAccountVerify(Request $request)
+    {
+        $authUser = auth()->guard('web')->user();
+        if ($authUser->phone != $request->phone) {
+            $user = User::where('phone', $request->phone)->first();
+            if ($user) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'success',
+                    'data' => $user,
+                ]);
+            }
+        }
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'Invalid phone number',
+        ]);
+    }
+
     public function passwordCheck(Request $request)
     {
         if (!$request->password) {
@@ -168,25 +196,6 @@ class PageController extends Controller
         return response()->json([
             'status' => 'fail',
             'message' => 'The password is incorrect',
-        ]);
-    }
-
-    public function toAccountVerify(Request $request)
-    {
-        $authUser = auth()->guard('web')->user();
-        if ($authUser->phone != $request->phone) {
-            $user = User::where('phone', $request->phone)->first();
-            if ($user) {
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'success',
-                    'data' => $user,
-                ]);
-            }
-        }
-        return response()->json([
-            'status' => 'fail',
-            'message' => 'Invalid phone number',
         ]);
     }
 }
