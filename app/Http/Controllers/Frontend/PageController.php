@@ -20,7 +20,7 @@ class PageController extends Controller
 {
     public function index()
     {
-        $user = Auth::guard('web')->user();
+        $user = Auth::user();
         return view('frontend.home', ['user' => $user]);
     }
 
