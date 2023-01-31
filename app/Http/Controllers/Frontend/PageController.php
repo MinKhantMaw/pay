@@ -150,15 +150,6 @@ class PageController extends Controller
         }
     }
 
-    public function transactions()
-    {
-        $authUser = auth()->user();
-        $transactions = Transaction::where('user_id', $authUser->id)->paginate(5);
-        return view('frontend.transactions', ['transactions' => $transactions]);
-    }
-
-
-
     public function toAccountVerify(Request $request)
     {
         $authUser = auth()->guard('web')->user();
@@ -197,5 +188,19 @@ class PageController extends Controller
             'status' => 'fail',
             'message' => 'The password is incorrect',
         ]);
+    }
+
+    public function transactions()
+    {
+        $authUser = auth()->user();
+        $transactions = Transaction::with(['user', 'source'])->where('user_id', $authUser->id)->orderBy('id', 'DESC')->paginate(5);
+        return view('frontend.transactions', ['transactions' => $transactions]);
+    }
+
+    public function transactionsDetails($trx_id)
+    {
+        $authUser = Auth::guard('web')->user();
+        $transactionDetail = Transaction::with(['user', 'source'])->where('user_id', $authUser->id)->where('trx_id', $trx_id)->first();
+        return view('frontend.transactionDetail', ['transactionDetail' => $transactionDetail]);
     }
 }
