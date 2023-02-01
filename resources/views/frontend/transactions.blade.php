@@ -2,6 +2,32 @@
 @section('title', 'Translation')
 @section('content')
     <div class="transaction">
+        <div class="card mb-2">
+            <div class="card-body p-2">
+                <div class="row">
+                    <div class="col-6">
+                        {{-- <div class="input-group my-2">
+                            <label class="input-group-text">Type</label>
+                            <select class="form-select">
+                                <option value="">All</option>
+                                <option value="1">Income</option>
+                                <option value="2">Expense</option>
+                            </select>
+                        </div> --}}
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group my-2">
+                            <label class="input-group-text">Type</label>
+                            <select class="form-select type">
+                                <option value="">All</option>
+                                <option value="1">Income</option>
+                                <option value="2">Expense</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body p-2">
                 <div class="infinite-scroll">
@@ -49,6 +75,10 @@
                 callback: function() {
                     $('ul.pagination').remove();
                 }
+            });
+            $('.type').change(function() {
+                var type = $('.type').val();
+                console.log(type);
             });
         });
     </script>

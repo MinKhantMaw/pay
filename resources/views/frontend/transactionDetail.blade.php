@@ -35,7 +35,7 @@
                     <p class="mb-0 text-muted">Type</p>
                     <p class="mb-0">
                         @if ($transactionDetail->type == 1)
-                            <span class="badge badge-pill badge-success text-success">Success</span>
+                            <span class="badge badge-pill badge-success text-success">Income</span>
                         @elseif($transactionDetail->type == 2)
                             <span class="badge badge-pill badge-danger text-danger">expnese</span>
                         @endif
