@@ -5,8 +5,14 @@
         <div class="card">
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <img src="{{ asset('img/money-transfer (1).png') }}" alt="">
+                    <img src="{{ asset('img/checked.png') }}" alt="">
                 </div>
+                @if (session('transfer_success'))
+                    <div class="alert alert-success text-center fade show" role="alert">
+                        {{ session('transfer_success') }}
+
+                    </div>
+                @endif
                 @if ($transactionDetail->type == 1)
                     <h5 class="text-center text-success"> {{ number_format($transactionDetail->amount) }} MMK</h5>
                 @elseif($transactionDetail->type == 2)
@@ -44,7 +50,7 @@
                 <hr>
 
                 <div class="d-flex justify-content-between">
-                    <p class="mb-0 text-muted">Amount</p>
+                    <p class="mb-0 text-muted">Transfer Date</p>
                     <p class="mb-0">{{ $transactionDetail->created_at }} </p>
                 </div>
                 <hr>

@@ -113,6 +113,7 @@
     <!-- Laravel Javascript Validation -->
     <script type="text/javascript" src="{{ url('vendor/jsvalidation/js/jsvalidation.js') }}"></script>
 
+    <script src="{{ asset('assets/frontend/js/jsscroll.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             let token = document.head.querySelector('meta[name="csrf-token"]');
