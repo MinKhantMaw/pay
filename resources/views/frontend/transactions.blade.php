@@ -20,8 +20,8 @@
                             <label class="input-group-text">Type</label>
                             <select class="form-select type">
                                 <option value="">All</option>
-                                <option value="1">Income</option>
-                                <option value="2">Expense</option>
+                                <option value="1" @if (request()->type == 1) selected @endif>Income</option>
+                                <option value="2" @if (request()->type == 2) selected @endif>Expense</option>
                             </select>
                         </div>
                     </div>
@@ -78,7 +78,8 @@
             });
             $('.type').change(function() {
                 var type = $('.type').val();
-                console.log(type);
+                history.pushState(null, '', `?type=${type}`);
+                window.location.reload();
             });
         });
     </script>

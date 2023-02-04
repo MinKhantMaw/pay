@@ -190,10 +190,14 @@ class PageController extends Controller
         ]);
     }
 
-    public function transactions()
+    public function transactions(Request $request)
     {
         $authUser = auth()->user();
-        $transactions = Transaction::with(['user', 'source'])->where('user_id', $authUser->id)->orderBy('id', 'DESC')->paginate(5);
+        $transactions = Transaction::with(['user', 'source'])->where('user_id', $authUser->id)->orderBy('id', 'DESC');
+        if ($request->type) {
+            $transactions = $transactions->where('type', $request->type);
+        }
+        $transactions = $transactions->paginate(5);
         return view('frontend.transactions', ['transactions' => $transactions]);
     }
 
