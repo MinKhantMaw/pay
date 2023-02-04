@@ -4,16 +4,14 @@
     <div class="transaction">
         <div class="card mb-2">
             <div class="card-body p-2">
+                <h6> <i class="fas fa-filter"></i> Filter</h6>
                 <div class="row">
                     <div class="col-6">
-                        {{-- <div class="input-group my-2">
-                            <label class="input-group-text">Type</label>
-                            <select class="form-select">
-                                <option value="">All</option>
-                                <option value="1">Income</option>
-                                <option value="2">Expense</option>
-                            </select>
-                        </div> --}}
+                        <div class="input-group my-2">
+                            <label class="input-group-text">Date</label>
+                            <input type="text" class="form-control date" value="{{ request()->date ?? date('Y-m-d') }}">
+                        </div>
+
                     </div>
                     <div class="col-6">
                         <div class="input-group my-2">
@@ -28,8 +26,11 @@
                 </div>
             </div>
         </div>
+
+        <h6> Transactions</h6>
         <div class="card">
             <div class="card-body p-2">
+
                 <div class="infinite-scroll">
                     @foreach ($transactions as $transaction)
                         <a href="{{ url('transactions/' . $transaction->trx_id) }}" class="text-decoration-none">
@@ -76,9 +77,26 @@
                     $('ul.pagination').remove();
                 }
             });
-            $('.type').change(function() {
+
+            $('.date').daterangepicker({
+                "singleDatePicker": true,
+                "autoApply": true,
+                "locale": {
+                    "format": "YYYY-MM-DD",
+                },
+            });
+
+            $('.date').on('apply.daterangepicker', function(ev, picker) {
+                var date = $('.date').val();
                 var type = $('.type').val();
-                history.pushState(null, '', `?type=${type}`);
+                history.pushState(null, '', `?date=${date}&type=${type}`)
+                window.location.reload();
+            });
+
+            $('.type').change(function() {
+                var date = $('.date').val();
+                var type = $('.type').val();
+                history.pushState(null, '', `?date=${date}&type=${type}`)
                 window.location.reload();
             });
         });
