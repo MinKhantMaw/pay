@@ -24,7 +24,7 @@
 
                     <div class="form-group">
                         <label class="mb-0"><strong>Amount (MMK)</strong></label>
-                        <p class="mb-1 text-muted">{{ number_format($amount) }}</p>
+                        <p class="mb-1 text-muted">{{ number_format($amount, 2) }}</p>
                     </div>
 
                     <div class="form-group">

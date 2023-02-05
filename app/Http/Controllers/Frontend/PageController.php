@@ -2,24 +2,27 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Helpers\WalletGenerate;
+use App\Helpers\EncodeDecode;
 use App\Models\User;
+
 use App\Models\Wallet;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Helpers\WalletGenerate;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use function GuzzleHttp\Promise\all;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
 use App\Http\Requests\UpdatePassword;
 use App\Http\Requests\TransferFormValidate;
-use App\Models\Transaction;
 
 class PageController extends Controller
 {
     public function index()
     {
+
         $user = Auth::user();
         return view('frontend.home', ['user' => $user]);
     }
@@ -83,7 +86,7 @@ class PageController extends Controller
 
 
         $from_account = $auth_user;
-        $amount = $request->amount;
+        $amount = EncodeDecode::idToHash($request->amount);
         $description = $request->description;
         return view('frontend.transfer_confirm', ['from_account' => $from_account, 'to_account' => $to_account, 'amount' => $amount, 'description' => $description]);
     }
