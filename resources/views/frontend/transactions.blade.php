@@ -2,24 +2,27 @@
 @section('title', 'Translation')
 @section('content')
     <div class="transaction">
-        <div class="card mb-2">
+        <div class="card mb-3">
             <div class="card-body p-2">
                 <h6> <i class="fas fa-filter"></i> Filter</h6>
                 <div class="row">
                     <div class="col-6">
                         <div class="input-group my-2">
-                            <label class="input-group-text">Date</label>
-                            <input type="text" class="form-control date" value="{{ request()->date ?? date('Y-m-d') }}">
+                            {{-- <div class="input-group-prepend"> --}}
+                            <label class="input-group-text p-1">Date</label>
+                            {{-- </div> --}}
+                            <input type="text" class="form-control date" value="{{ request()->date }}" placeholder="All">
                         </div>
-
                     </div>
                     <div class="col-6">
                         <div class="input-group my-2">
-                            <label class="input-group-text">Type</label>
+                            {{-- <div class="input-group-prepend"> --}}
+                            <label class="input-group-text p-1">Type</label>
+                            {{-- </div> --}}
                             <select class="form-select type">
                                 <option value="">All</option>
-                                <option value="1" @if (request()->type === 1) selected @endif>Income</option>
-                                <option value="2" @if (request()->type === 2) selected @endif>Expense</option>
+                                <option value="1" @if (request()->type == 1) selected @endif>Income</option>
+                                <option value="2" @if (request()->type == 2) selected @endif>Expense</option>
                             </select>
                         </div>
                     </div>
