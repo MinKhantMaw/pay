@@ -23,7 +23,9 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('/transfer-hash', 'transferHash')->name('transferHash');
 
     Route::get('transactions', 'transactions')->name('transactions');
-    Route::get('transactions/{trx_id}', 'transactionsDetails')->name('transactionsDetails');;
+    Route::get('transactions/{trx_id}', 'transactionsDetails')->name('transactionsDetails');
+
+    Route::get('receive-qr', 'receiveQR')->name('receive-qr');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {

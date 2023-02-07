@@ -20,12 +20,14 @@
                 </div>
             </div>
             <div class="col-6">
-                <div class="card shortcut-box mb-3" style="margin-right: 8px">
-                    <div class="card-body p-2 mr-1">
-                        <img src="{{ asset('img/qr-code.png') }}" alt="">
-                        <span>Receive QR</span>
+                <a href="{{ url('receive-qr') }}" class="text-decoration-none text-dark">
+                    <div class="card shortcut-box mb-3" style="margin-right: 8px">
+                        <div class="card-body p-2 mr-1">
+                            <img src="{{ asset('img/qr-code.png') }}" alt="">
+                            <span>Receive QR</span>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-12">
                 <div class="card mb-3 function-box m-2">

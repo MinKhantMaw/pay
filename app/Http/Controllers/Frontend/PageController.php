@@ -256,4 +256,10 @@ class PageController extends Controller
             'data' => $hash_value,
         ]);
     }
+
+    public function receiveQR()
+    {
+        $authUser = auth()->guard('web')->user();
+        return view('frontend.receive_qr', ['authUser' => $authUser]);
+    }
 }
