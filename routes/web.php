@@ -20,6 +20,7 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('/to-account-verify', 'toAccountVerify')->name('toAccountVerify');
     Route::post('/transfers/complete', 'transferComplete')->name('transferComplete');
     Route::get('/transfers/confirm/password-check', 'passwordCheck')->name('passwordCheck');
+    Route::get('/transfer-hash', 'transferHash')->name('transferHash');
 
     Route::get('transactions', 'transactions')->name('transactions');
     Route::get('transactions/{trx_id}', 'transactionsDetails')->name('transactionsDetails');;

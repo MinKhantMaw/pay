@@ -4,20 +4,14 @@
     <div class="transfer">
         <div class="card">
             <div class="card-body">
-
-                <form action="{{ route('transferConfirm') }}" method="GET">
+                <form action="{{ route('transferConfirm') }}" method="GET" id="transfer-form">
                     @csrf
+                    <input type="hidden" name="hash_value" class="hash_value" value="">
                     <div class="form-group">
                         <label class="mb-1">From</label>
                         <p class="mb-1 text-muted">{{ $auth_user->name }}</p>
                         <p class="mb-1 text-muted">{{ $auth_user->phone }}</p>
                     </div>
-
-                    <div class="form-group">
-
-
-                    </div>
-
                     <div class="form-group">
                         <label for="to">To <span class="text-success to_account_info"></span></label>
                         <div class="input-group">
@@ -39,7 +33,7 @@
                     <div class="form-group">
                         <label for="to">Amount (MMK)</label>
                         <input type="number" value="{{ old('amount') }}"
-                            class="form-control @error('amount')
+                            class="form-control amount @error('amount')
                             is-invalid
                         @enderror"
                             name="amount" autocomplete="off">
@@ -50,9 +44,9 @@
 
                     <div class="form-group">
                         <label for="to">Description</label>
-                        <textarea name="" id="" class="form-control">{{ old('message') }}</textarea>
+                        <textarea name="description" id="" class="form-control">{{ old('message') }}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-theme btn-block mt-5 text-white"
+                    <button type="submit" class="btn btn-theme btn-block mt-5 text-white submit-btn"
                         style="width: 100%">Continue</button>
                 </form>
             </div>
@@ -75,6 +69,22 @@
                             $('.to_account_info').text('(' + res.data['name'] + ')');
                         } else {
                             $('.to_account_info').text('(' + res.message + ')');
+                        }
+                    }
+                });
+            });
+            $('.submit-btn').on('click', function(e) {
+                e.preventDefault();
+                var to_phone = $('.to_phone').val();
+                var amount = $('.amount').val();
+                var description = $('.description').val();
+                $.ajax({
+                    url: `/transfer-hash?to_phone=${to_phone}&amount=${amount}&description=${description}`,
+                    type: 'GET',
+                    success: function(res) {
+                        if (res.status == 'success') {
+                            $('.hash_value').val(res.data);
+                            $('#transfer-form').submit();
                         }
                     }
                 });

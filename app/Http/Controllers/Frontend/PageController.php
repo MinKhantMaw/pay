@@ -70,18 +70,24 @@ class PageController extends Controller
 
     public function transferConfirm(TransferFormValidate $request)
     {
-        $str = $request->to_phone . $request->amount . $request->description;
-        $hash_value2 = hash_hmac('sha256', $str, 'magicpay@123');
-        if ($request->hash_value !== $hash_value2) {
-            return back()->withErrors(['amount' => 'The given data is invalid.'])->withInput();
-        }
+        $auth_user = auth()->guard('web')->user();
+        $from_account = $auth_user;
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        $hash_value = $request->hash_value;
+        // $str = $request->to_phone . $request->amount . $request->description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay@123');
+        // if ($request->hash_value !== $hash_value2) {
+        //     return back()->withErrors(['amount' => 'The given data is invalid.'])->withInput();
+        // }
 
-        if ($request->amount < 1000) {
+        if ($amount < 1000) {
             return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
         }
 
-        $auth_user = auth()->guard('web')->user();
-        if ($auth_user->phone == $request->to_phone) {
+
+        if ($from_account == $to_phone) {
             return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
         }
 
@@ -90,18 +96,37 @@ class PageController extends Controller
             return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
         }
 
+        if (!$from_account->wallet || !$to_account->wallet) {
+            return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
+        }
 
-        $from_account = $auth_user;
-        $amount = $request->amount;
-        $description = $request->description;
-        return view('frontend.transfer_confirm', ['from_account' => $from_account, 'to_account' => $to_account, 'amount' => $amount, 'description' => $description]);
+        if ($from_account->wallet->amount < $amount) {
+            return back()->withErrors(['amount' => 'The amount is not enought...!'])->withInput();
+        }
+
+        return view('frontend.transfer_confirm', ['from_account' => $from_account, 'to_account' => $to_account, 'amount' => $amount, 'description' => $description, 'hash_value' => $hash_value]);
     }
 
     public function transferComplete(TransferFormValidate $request)
     {
-        // return $request->all();
         $auth_user = auth()->guard('web')->user();
-        if ($auth_user->phone == $request->to_phone) {
+        $from_account = $auth_user;
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        $hash_value = $request->hash_value;
+        // $str = $request->to_phone . $request->amount . $request->description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay@123');
+        // if ($request->hash_value !== $hash_value2) {
+        //     return back()->withErrors(['amount' => 'The given data is invalid.'])->withInput();
+        // }
+
+        if ($amount < 1000) {
+            return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
+        }
+
+
+        if ($from_account == $to_phone) {
             return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
         }
 
@@ -110,13 +135,12 @@ class PageController extends Controller
             return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
         }
 
-
-        $from_account = $auth_user;
-        $amount = $request->amount;
-        $description = $request->description;
-
         if (!$from_account->wallet || !$to_account->wallet) {
             return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
+        }
+
+        if ($from_account->wallet->amount < $amount) {
+            return back()->withErrors(['amount' => 'The amount is not enought...!'])->withInput();
         }
 
         DB::beginTransaction();
