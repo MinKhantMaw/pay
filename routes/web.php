@@ -26,6 +26,7 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('transactions/{trx_id}', 'transactionsDetails')->name('transactionsDetails');
 
     Route::get('receive-qr', 'receiveQR')->name('receive-qr');
+    Route::get('scan-pay', 'scanPay')->name('scanpay');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {

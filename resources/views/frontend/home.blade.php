@@ -12,12 +12,14 @@
                 </div>
             </div>
             <div class="col-6">
-                <div class="card shortcut-box mb-3" style="margin-left: 8px">
-                    <div class="card-body p-2">
-                        <img src="{{ asset('img/qr-code-scan.png') }}" alt="">
-                        <span>Scan & Pay</span>
+                <a href="{{ route('scanpay') }}" class="text-decoration-none text-dark">
+                    <div class="card shortcut-box mb-3" style="margin-left: 8px">
+                        <div class="card-body p-2">
+                            <img src="{{ asset('img/qr-code-scan.png') }}" alt="">
+                            <span>Scan & Pay</span>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-6">
                 <a href="{{ url('receive-qr') }}" class="text-decoration-none text-dark">
