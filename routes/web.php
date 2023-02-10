@@ -26,10 +26,11 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
     Route::get('transactions/{trx_id}', 'transactionsDetails')->name('transactionsDetails');
 
     Route::get('receive-qr', 'receiveQR')->name('receive-qr');
-    Route::get('scan-pay', 'scanPay')->name('scanpay');
+
+    Route::get('scan-and-pay', 'scanAndPay')->name('scanpay');
     Route::get('scan-and-pay-form', 'scanAndPayForm')->name('scanAndPayForm');
     Route::get('scan-and-pay/confirm', 'scanAndPayConfirm')->name('scanAndPayConfirm');
-    Route::post('scan-and-pay/complete', 'scanAndPayConfirm')->name('scanAndPayComplete');
+    Route::post('scan-and-pay/complete', 'scanAndPayComplete')->name('scanAndPayComplete');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {

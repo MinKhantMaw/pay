@@ -70,45 +70,48 @@ class PageController extends Controller
 
     public function transferConfirm(TransferFormValidate $request)
     {
-        $auth_user = auth()->guard('web')->user();
-        $from_account = $auth_user;
+
+        $authUser = auth()->guard('web')->user();
+        $from_account = $authUser;
         $to_phone = $request->to_phone;
         $amount = $request->amount;
         $description = $request->description;
         $hash_value = $request->hash_value;
-        // $str = $request->to_phone . $request->amount . $request->description;
-        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay@123');
-        // if ($request->hash_value !== $hash_value2) {
+
+        // $str = $to_phone . $amount . $description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay123!@#');
+        // if ($hash_value !== $hash_value2) {
         //     return back()->withErrors(['amount' => 'The given data is invalid.'])->withInput();
         // }
 
         if ($amount < 1000) {
-            return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
+            return back()->withErrors(['amount' => 'The amount must be at least 1000 MMK.'])->withInput();
         }
 
-
-        if ($from_account == $to_phone) {
-            return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
+        if ($from_account->phone == $to_phone) {
+            return back()->withErrors(['to_phone' => 'To account is invalid.'])->withInput();
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
         if (!$to_account) {
-            return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
+            return back()->withErrors(['to_phone' => 'To account is invalid.'])->withInput();
         }
 
         if (!$from_account->wallet || !$to_account->wallet) {
-            return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
+            return back()->withErrors(['fail' => 'The given data is invalid.'])->withInput();
         }
 
         if ($from_account->wallet->amount < $amount) {
-            return back()->withErrors(['amount' => 'The amount is not enought...!'])->withInput();
+            return back()->withErrors(['amount' => 'The amount is not enough.'])->withInput();
         }
+
 
         return view('frontend.transfer_confirm', ['from_account' => $from_account, 'to_account' => $to_account, 'amount' => $amount, 'description' => $description, 'hash_value' => $hash_value]);
     }
 
     public function transferComplete(TransferFormValidate $request)
     {
+        // return $request->all();
         $auth_user = auth()->guard('web')->user();
         $from_account = $auth_user;
         $to_phone = $request->to_phone;
@@ -176,6 +179,7 @@ class PageController extends Controller
             $to_account_transaction->save();
 
             DB::commit();
+
             return redirect('/transactions/' . $from_account_transaction->trx_id)->with('transfer_success', 'Successfully transferred');
         } catch (\Exception  $error) {
             DB::rollBack();
@@ -263,7 +267,7 @@ class PageController extends Controller
         return view('frontend.receive_qr', ['authUser' => $authUser]);
     }
 
-    public function scanPay()
+    public function scanAndPay()
     {
         return view('frontend.scan_and_pay');
     }
@@ -273,7 +277,7 @@ class PageController extends Controller
         $from_account = auth()->guard('web')->user();
         $to_account = User::where('phone', $request->to_phone)->first();
         if (!$to_account) {
-            return back()->withErrors(['fail', 'QR is invalid...!']);
+            return back()->withErrors(['fail' => 'QR is invalid...!']);
         }
 
         return view('frontend.scan_and_pay_form', ['to_account' => $to_account, 'from_account' => $from_account]);
@@ -320,6 +324,7 @@ class PageController extends Controller
 
     public function scanAndPayComplete(TransferFormValidate $request)
     {
+        // return $request->all();
         $auth_user = auth()->guard('web')->user();
         $from_account = $auth_user;
         $to_phone = $request->to_phone;
@@ -387,6 +392,7 @@ class PageController extends Controller
             $to_account_transaction->save();
 
             DB::commit();
+
             return redirect('/transactions/' . $from_account_transaction->trx_id)->with('transfer_success', 'Successfully transferred');
         } catch (\Exception  $error) {
             DB::rollBack();

@@ -4,6 +4,7 @@
     <div class="scan-and-pay">
         <div class="card my-card" style="margin: 0 10px 0 10px">
             <div class="card-body text-center">
+                {{-- @include('frontend.layouts.flash') --}}
                 <div class="text-center">
                     <img src="{{ asset('img/scanpay.png') }}" alt="" style="width: 220px">
                 </div>

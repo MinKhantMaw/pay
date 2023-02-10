@@ -5,7 +5,7 @@
         <div class="card mt-1">
             <div class="card-body">
                 @include('backend.layouts.flag')
-                <form action="{{ route('scanAndPayComplete') }}" method="POST" id="form">
+                <form action="{{ url('scan-and-pay/complete') }}" method="POST" id="form">
                     @csrf
                     <input type="hidden" name="hash_value" value="{{ $hash_value }}">
                     <input type="hidden" name="to_phone" value="{{ $to_account->phone }}">

@@ -10,10 +10,10 @@
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
                             <div class="form-group">
-                                <label for="">Email</label>
-                                <input type="text" name="email" value="{{ old('email') }}"
-                                    class="form-control @error('email') is-invalid @enderror" id="">
-                                @error('email')
+                                <label for="">Phone</label>
+                                <input type="text" name="phone" value="{{ old('phone') }}"
+                                    class="form-control @error('phone') is-invalid @enderror" id="">
+                                @error('phone')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

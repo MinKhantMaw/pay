@@ -4,7 +4,7 @@
     <div class="transfer">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('scanAndPayConfirm') }}" method="GET" id="transfer-form">
+                <form action="{{ url('scan-and-pay/confirm') }}" method="GET" id="transfer-form">
                     @csrf
                     <input type="hidden" name="hash_value" class="hash_value" value="">
                     <input type="hidden" name="to_phone" class="to_phone" value="{{ $to_account->phone }}">
@@ -48,20 +48,6 @@
 
     <script>
         $('document').ready(function() {
-            $('.verify-btn').on('click', function() {
-                var phone = $('.to_phone').val();
-                $.ajax({
-                    url: '/to-account-verify?phone=' + phone,
-                    type: 'GET',
-                    success: function(res) {
-                        if (res.status == 'success') {
-                            $('.to_account_info').text('(' + res.data['name'] + ')');
-                        } else {
-                            $('.to_account_info').text('(' + res.message + ')');
-                        }
-                    }
-                });
-            });
             $('.submit-btn').on('click', function(e) {
                 e.preventDefault();
                 var to_phone = $('.to_phone').val();
