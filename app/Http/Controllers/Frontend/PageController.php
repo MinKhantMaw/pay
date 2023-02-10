@@ -24,6 +24,7 @@ class PageController extends Controller
     {
 
         $user = Auth::user();
+
         return view('frontend.home', ['user' => $user]);
     }
 
