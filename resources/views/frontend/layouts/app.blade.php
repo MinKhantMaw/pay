@@ -61,7 +61,7 @@
         </div>
 
         <div class="bottom-menu">
-            <a href="" class="scan-tab">
+            <a href="{{ route('scanpay') }}" class="scan-tab">
                 <div class="inside">
                     <i class="fas fa-qrcode"></i>
                 </div>
