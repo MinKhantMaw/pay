@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Helpers\EncodeDecode;
 use App\Models\User;
-
-use App\Models\Wallet;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Helpers\WalletGenerate;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use function GuzzleHttp\Promise\all;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdatePassword;
 use App\Http\Requests\TransferFormValidate;
+use App\Notifications\GeneralNotification;
+use Illuminate\Support\Facades\Notification;
 
 class PageController extends Controller
 {
@@ -25,6 +22,13 @@ class PageController extends Controller
 
         $user = Auth::user();
 
+        $title = 'hello';
+        $message = 'lorem';
+        $sourceable_id = 1;
+        $sourceable_type = User::class;
+        $web_link = url('profile');
+
+        Notification::send($user, new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link));
         return view('frontend.home', ['user' => $user]);
     }
 
@@ -49,6 +53,14 @@ class PageController extends Controller
         if (Hash::check($old_password, $user->password)) {
             $user->password = Hash::make($new_password);
             $user->update();
+
+            $title = 'password changed';
+            $message = 'Your password has been changed successfully';
+            $sourceable_id = $user->id;
+            $sourceable_type = User::class;
+            $web_link = url('profile');
+
+            Notification::send($user, new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link));
 
             return redirect()->route('profile')->with('update', 'Successfully password Updated');
         }
