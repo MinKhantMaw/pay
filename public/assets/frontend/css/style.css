@@ -273,3 +273,10 @@ body {
 .transaction-detail img {
     width: 50px;
 }
+
+/* .unread_noti_count {
+    position: absolute;
+    top: -8px;
+    right: 15px;
+    padding: 3px;
+} */
