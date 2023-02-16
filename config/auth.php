@@ -18,10 +18,6 @@ return [
         'passwords' => 'users',
     ],
 
-    'defaults' => [
-        'guard' => 'api',
-        'passwords' => 'users',
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -45,13 +41,15 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'api' => [
-            'driver' => 'passport',
-            'provider' => 'users',
-        ],
+
         'admin_user' => [
             'driver' => 'session',
             'provider' => 'admin_users',
+        ],
+
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
         ],
     ],
 
