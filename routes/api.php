@@ -28,5 +28,8 @@ Route::controller(AuthController::class)->group(function () {
         Route::post('logout', 'logout');
         Route::get('transaction', 'transaction');
         Route::get('transaction/{id}', 'transactionDetail');
+
+        Route::get('notification', 'notification');
+        Route::get('notification/{id}', 'notificationDetail');
     });
 });

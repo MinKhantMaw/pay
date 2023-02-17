@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\TransactionResource;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Transaction;
@@ -13,7 +12,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\ProfileResource;
+use App\Http\Resources\TransactionResource;
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\TransactionDetailResource;
+use App\Http\Resources\NotificationDetailResource;
 
 class AuthController extends Controller
 {
@@ -145,5 +147,24 @@ class AuthController extends Controller
         $transaction_detail = Transaction::with(['user', 'source'])->where('trx_id', $trx_id)->where('user_id', $authUser->id)->firstOrFail();
         $data = new TransactionDetailResource($transaction_detail);
         return ApiResponse::success('Fetch Transaction Detail', $data, 200);
+    }
+
+    public function notification()
+    {
+        $authUser = auth()->user();
+        $notifications = $authUser->notifications()->paginate(5);
+
+        return NotificationResource::collection($notifications)->additional(['message' => 'Fetch Notifications',]);
+    }
+
+    public function notificationDetail($id)
+    {
+        $authUser = auth()->user();
+        $notification = $authUser->notifications()->where('id', $id)->firstOrFail();
+        $notification->markAsRead();
+
+        $data = new NotificationDetailResource($notification);
+
+        return ApiResponse::success('Fetch Notification', $data, 200);
     }
 }

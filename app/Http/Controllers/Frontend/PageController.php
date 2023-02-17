@@ -59,8 +59,12 @@ class PageController extends Controller
             $sourceable_id = $user->id;
             $sourceable_type = User::class;
             $web_link = url('profile');
+            $deep_link = [
+                'target' => 'profile',
+                'parameter' => null,
+            ];
 
-            Notification::send($user, new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link));
+            Notification::send($user, new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
 
             return redirect()->route('profile')->with('update', 'Successfully password Updated');
         }
@@ -197,7 +201,13 @@ class PageController extends Controller
             $sourceable_id = $from_account_transaction->id;
             $sourceable_type = Transaction::class;
             $web_link = url('/transactions/' . $from_account_transaction->trx_id);
-            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link));
+            $deep_link = [
+                'target' => 'transaction_detail',
+                'parameter' => [
+                    'tax_id' => $from_account_transaction->trx_id,
+                ],
+            ];
+            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
 
             // To Notification
             $title = 'Recieve From';
@@ -205,7 +215,13 @@ class PageController extends Controller
             $sourceable_id = $to_account_transaction->id;
             $sourceable_type = Transaction::class;
             $web_link =  url('/transactions/' . $to_account_transaction->trx_id);
-            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link));
+            $deep_link = [
+                'target' => 'transaction_detail',
+                'parameter' => [
+                    'tax_id' => $to_account_transaction->trx_id,
+                ],
+            ];
+            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
 
             DB::commit();
 
