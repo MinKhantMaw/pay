@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\ProfileResource;
+use App\Http\Resources\TransactionDetailResource;
 
 class AuthController extends Controller
 {
@@ -132,9 +133,17 @@ class AuthController extends Controller
             $transaction = $transaction->where('type', $request->type);
         }
 
-        $transaction = $transaction->get();
+        $transaction = $transaction->paginate(5);
 
-        $transaction_resource = TransactionResource::collection($transaction);
-        return ApiResponse::success('Fetch Transaction Successfully', $transaction_resource, 200);
+        $transaction_resource = TransactionResource::collection($transaction)->additional(['message' => 'Fetch Transaction Successfully']);
+        return $transaction_resource;
+    }
+
+    public function transactionDetail($trx_id)
+    {
+        $authUser = auth()->user();
+        $transaction_detail = Transaction::with(['user', 'source'])->where('trx_id', $trx_id)->where('user_id', $authUser->id)->firstOrFail();
+        $data = new TransactionDetailResource($transaction_detail);
+        return ApiResponse::success('Fetch Transaction Detail', $data, 200);
     }
 }
