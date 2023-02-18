@@ -24,7 +24,7 @@ class ProfileResource extends JsonResource
             'account_number' => $this->wallet ? $this->wallet->account_number : '',
             'balance' => $this->walle09123t ? number_format($this->wallet->amount) : 0,
             'profile' => asset('img/user.png'),
-            'has_value' => $this->phone,
+            'receive_qr_value' => $this->phone,
             'unread_noti_count' => $unread_noti_count,
         ];
     }

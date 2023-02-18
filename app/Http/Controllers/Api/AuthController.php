@@ -8,12 +8,16 @@ use App\Models\Transaction;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Helpers\WalletGenerate;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\ProfileResource;
+use App\Notifications\GeneralNotification;
+use App\Http\Requests\TransferFormValidate;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\NotificationResource;
+use Illuminate\Support\Facades\Notification;
 use App\Http\Resources\TransactionDetailResource;
 use App\Http\Resources\NotificationDetailResource;
 
@@ -166,5 +170,365 @@ class AuthController extends Controller
         $data = new NotificationDetailResource($notification);
 
         return ApiResponse::success('Fetch Notification', $data, 200);
+    }
+
+    public function toAccountVerify(Request $request)
+    {
+        if ($request->phone) {
+            $authUser = auth()->user();
+            if ($authUser->phone != $request->phone) {
+                $user = User::where('phone', $request->phone)->first();
+                if ($user) {
+                    return ApiResponse::success('Fetch User', [
+                        'name' => $user->name,
+                        'phone' => $user->phone,
+                    ], 200);
+                }
+            }
+        }
+
+        return ApiResponse::fail('Invalid Phone Authentication', null, 422);
+    }
+
+    public function transferConfirm(TransferFormValidate $request)
+    {
+        $authUser = auth()->user();
+        $from_account = $authUser;
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        // $hash_value = $request->hash_value;
+
+        // $str = $to_phone . $amount . $description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay123!@#');
+        // if ($hash_value !== $hash_value2) {
+        //     return ApiResponse::fail('The given data is invalid', null, 422);
+        // }
+
+        if ($amount < 1000) {
+            return ApiResponse::fail('The amount must be at least 1000 MMK.', null, 422);
+        }
+
+        if ($from_account->phone == $to_phone) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        if (!$from_account->wallet || !$to_account->wallet) {
+            return ApiResponse::fail('The given data is invalid.', null, 422);
+        }
+
+        if ($from_account->wallet->amount < $amount) {
+            return ApiResponse::fail('The amount is not enough.', null, 422);
+        }
+
+        return ApiResponse::success('success', [
+            'from_name' => $from_account->name,
+            'from_phone' => $from_account->phone,
+
+            'to_name' => $to_account->name,
+            'to_phone' => $to_account->phone,
+
+            'amount' => $amount,
+            'description' => $description,
+            // 'hash_value' => $hash_value,
+        ], 200);
+    }
+
+    public function transferComplete(TransferFormValidate $request)
+    {
+        if (!$request->password) {
+            return ApiResponse::fail('Please fill your password.', null, 422);
+        }
+
+        $authUser = auth()->user();
+        if (!Hash::check($request->password, $authUser->password)) {
+            return ApiResponse::fail('The password is incorrect.', null, 422);
+        }
+
+        $from_account = $authUser;
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        // $hash_value = $request->hash_value;
+
+        // $str = $to_phone . $amount . $description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay123!@#');
+        // if ($hash_value !== $hash_value2) {
+        //     return ApiResponse::fail('The given data is invalid.', null, 422);
+        // }
+
+        if ($amount < 1000) {
+            return ApiResponse::fail('The amount must be at least 1000 MMK.', null, 422);
+        }
+
+        if ($from_account->phone == $to_phone) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        if (!$from_account->wallet || !$to_account->wallet) {
+            return ApiResponse::fail('The given data is invalid.', null, 422);
+        }
+
+        if ($from_account->wallet->amount < $amount) {
+            return ApiResponse::fail('The amount is not enough.', null, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $from_account_wallet = $from_account->wallet;
+            $from_account_wallet->decrement('amount', $amount);
+            $from_account_wallet->update();
+
+            $to_account_wallet = $to_account->wallet;
+            $to_account_wallet->increment('amount', $amount);
+            $to_account_wallet->update();
+
+            $ref_no = WalletGenerate::refNumber();
+            $from_account_transaction = new Transaction();
+            $from_account_transaction->ref_no = $ref_no;
+            $from_account_transaction->trx_id = WalletGenerate::trxId();
+            $from_account_transaction->user_id = $from_account->id;
+            $from_account_transaction->type = 2;
+            $from_account_transaction->amount = $amount;
+            $from_account_transaction->source_id = $to_account->id;
+            $from_account_transaction->description = $description;
+            $from_account_transaction->save();
+
+            $to_account_transaction = new Transaction();
+            $to_account_transaction->ref_no = $ref_no;
+            $to_account_transaction->trx_id = WalletGenerate::trxId();
+            $to_account_transaction->user_id = $to_account->id;
+            $to_account_transaction->type = 1;
+            $to_account_transaction->amount = $amount;
+            $to_account_transaction->source_id = $from_account->id;
+            $to_account_transaction->description = $description;
+            $to_account_transaction->save();
+
+            // From Noti
+            $title = 'E-money Transfered!';
+            $message = 'Your wallet transfered ' . number_format($amount) . ' MMK to ' . $to_account->name . ' ( ' . $to_account->phone . ' )';
+            $sourceable_id = $from_account_transaction->id;
+            $sourceable_type = Transaction::class;
+            $web_link = url('/transaction/' . $from_account_transaction->trx_id);
+            $deep_link = [
+                'target' => 'transaction_detail',
+                'parameter' => [
+                    'trx_id' => $from_account_transaction->trx_id,
+                ],
+            ];
+            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+
+            // To Noti
+            $title = 'E-money Received!';
+            $message = 'Your wallet received ' . number_format($amount) . ' MMK from ' . $from_account->name . ' ( ' . $from_account->phone . ' )';
+            $sourceable_id = $to_account_transaction->id;
+            $sourceable_type = Transaction::class;
+            $web_link = url('/transaction/' . $to_account_transaction->trx_id);
+            $deep_link = [
+                'target' => 'transaction_detail',
+                'parameter' => [
+                    'trx_id' => $to_account_transaction->trx_id,
+                ],
+            ];
+            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+
+            DB::commit();
+
+            return ApiResponse::success('Successfully Transfered', ['trx_id' => $from_account_transaction->trx_id], 200);
+        } catch (\Exception $error) {
+            DB::rollback();
+            return ApiResponse::fail('Something wrong. ' . $error->getMessage(), null, 422);
+        }
+    }
+
+    public function scanAndPayForm(Request $request)
+    {
+        $from_account = auth()->user();
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
+            return ApiResponse::fail('You have no account to scan.', $to_account, 422);
+        }
+
+        return ApiResponse::success(
+            'Fetch QR Code',
+            [
+                'from_name' => $from_account->name,
+                'from_phone' => $from_account->phone,
+                'to_name' => $to_account->name,
+                'to_phone' => $to_account->phone,
+            ],
+            200
+        );
+    }
+
+    public function scanAndPayConfirm(TransferFormValidate $request)
+    {
+        $authUser = auth()->user();
+        $from_account = $authUser;
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        // $hash_value = $request->hash_value;
+
+        // $str = $to_phone . $amount . $description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay123!@#');
+        // if ($hash_value !== $hash_value2) {
+        //     return fail('The given data is invalid.', null);
+        // }
+
+        if ($amount < 1000) {
+            return ApiResponse::fail('The amount must be at least 1000 MMK.', null, 422);
+        }
+
+        if ($from_account->phone == $to_phone) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        if (!$from_account->wallet || !$to_account->wallet) {
+            return ApiResponse::fail('The given data is invalid.', null, 422);
+        }
+
+        if ($from_account->wallet->amount < $amount) {
+            return ApiResponse::fail('The amount is not enough.', null, 422);
+        }
+
+        return ApiResponse::success('success', [
+            'from_name' => $from_account->name,
+            'from_phone' => $from_account->phone,
+
+            'to_name' => $to_account->name,
+            'to_phone' => $to_account->phone,
+
+            'amount' => $amount,
+            'description' => $description,
+            // 'hash_value' => $hash_value,
+        ], 200);
+    }
+
+    public function scanAndPayComplete(TransferFormValidate $request)
+    {
+        if (!$request->password) {
+            return ApiResponse::fail('Please fill your password.', null, 422);
+        }
+
+        $authUser = auth()->user();
+        if (!Hash::check($request->password, $authUser->password)) {
+            return ApiResponse::fail('The password is incorrect.', null, 422);
+        }
+
+        $from_account = $authUser;
+        $to_phone = $request->to_phone;
+        $amount = $request->amount;
+        $description = $request->description;
+        // $hash_value = $request->hash_value;
+
+        // $str = $to_phone . $amount . $description;
+        // $hash_value2 = hash_hmac('sha256', $str, 'magicpay123!@#');
+        // if ($hash_value !== $hash_value2) {
+        //     return ApiResponse::fail('The given data is invalid.', null, 422);
+        // }
+
+        if ($amount < 1000) {
+            return ApiResponse::fail('The amount must be at least 1000 MMK.', null, 422);
+        }
+
+        if ($from_account->phone == $to_phone) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        $to_account = User::where('phone', $request->to_phone)->first();
+        if (!$to_account) {
+            return ApiResponse::fail('To account is invalid.', null, 422);
+        }
+
+        if (!$from_account->wallet || !$to_account->wallet) {
+            return ApiResponse::fail('The given data is invalid.', null, 422);
+        }
+
+        if ($from_account->wallet->amount < $amount) {
+            return ApiResponse::fail('The amount is not enough.', null, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $from_account_wallet = $from_account->wallet;
+            $from_account_wallet->decrement('amount', $amount);
+            $from_account_wallet->update();
+
+            $to_account_wallet = $to_account->wallet;
+            $to_account_wallet->increment('amount', $amount);
+            $to_account_wallet->update();
+
+            $ref_no = WalletGenerate::refNumber();
+            $from_account_transaction = new Transaction();
+            $from_account_transaction->ref_no = $ref_no;
+            $from_account_transaction->trx_id = WalletGenerate::trxId();
+            $from_account_transaction->user_id = $from_account->id;
+            $from_account_transaction->type = 2;
+            $from_account_transaction->amount = $amount;
+            $from_account_transaction->source_id = $to_account->id;
+            $from_account_transaction->description = $description;
+            $from_account_transaction->save();
+
+            $to_account_transaction = new Transaction();
+            $to_account_transaction->ref_no = $ref_no;
+            $to_account_transaction->trx_id = WalletGenerate::trxId();
+            $to_account_transaction->user_id = $to_account->id;
+            $to_account_transaction->type = 1;
+            $to_account_transaction->amount = $amount;
+            $to_account_transaction->source_id = $from_account->id;
+            $to_account_transaction->description = $description;
+            $to_account_transaction->save();
+
+            // From Noti
+            $title = 'E-money Transfered!';
+            $message = 'Your wallet transfered ' . number_format($amount) . ' MMK to ' . $to_account->name . ' ( ' . $to_account->phone . ' )';
+            $sourceable_id = $from_account_transaction->id;
+            $sourceable_type = Transaction::class;
+            $web_link = url('/transaction/' . $from_account_transaction->trx_id);
+            $deep_link = [
+                'target' => 'transaction_detail',
+                'parameter' => [
+                    'trx_id' => $from_account_transaction->trx_id,
+                ],
+            ];
+            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+
+            // To Noti
+            $title = 'E-money Received!';
+            $message = 'Your wallet received ' . number_format($amount) . ' MMK from ' . $from_account->name . ' ( ' . $from_account->phone . ' )';
+            $sourceable_id = $to_account_transaction->id;
+            $sourceable_type = Transaction::class;
+            $web_link = url('/transaction/' . $to_account_transaction->trx_id);
+            $deep_link = [
+                'target' => 'transaction_detail',
+                'parameter' => [
+                    'trx_id' => $to_account_transaction->trx_id,
+                ],
+            ];
+            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+
+            DB::commit();
+
+            return ApiResponse::success('Successfully Transfered', ['trx_id' => $from_account_transaction->trx_id], 200);
+        } catch (\Exception $error) {
+            DB::rollback();
+            return ApiResponse::fail('Something wrong. ' . $error->getMessage(), null, 422);
+        }
     }
 }

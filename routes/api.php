@@ -31,5 +31,13 @@ Route::controller(AuthController::class)->group(function () {
 
         Route::get('notification', 'notification');
         Route::get('notification/{id}', 'notificationDetail');
+
+        Route::get('to-account-verify', 'toAccountVerify');
+        Route::get('transfer/confirm', 'transferConfirm');
+        Route::post('transfer/complete', 'transferComplete');
+
+        Route::get('scan-and-pay-form', 'scanAndPayForm');
+        Route::get('/scan-and-pay/confirm', 'scanAndPayConfirm');
+        Route::post('/scan-and-pay/complete', 'scanAndPayComplete');
     });
 });
