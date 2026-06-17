@@ -1,10 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\Backend\PageController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Backend\PageController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\Wallet\WalletController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('/admin')->middleware('auth:admin_user')->group(function () {
     Route::controller(PageController::class)->name('admin.')->group(function () {
@@ -30,4 +31,9 @@ Route::prefix('/admin')->name('wallet.')->middleware('auth:admin_user')->group(f
 
     Route::get('wallet/reduce/amount', [WalletController::class, 'reduceAmount'])->name('reduceAmount');
     Route::post('wallet/reduce/amount/store', [WalletController::class, 'reduceAmountStore'])->name('reduceAmountStore');
+});
+
+Route::prefix('/admin')->name('admin.notifications.')->middleware('auth:admin_user')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
 });

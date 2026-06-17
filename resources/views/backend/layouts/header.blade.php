@@ -31,6 +31,52 @@
     </div>
     <div class="app-header__content">
         <div class="app-header-right">
+            <div class="header-btn-lg pr-0 mr-3" id="realtime-notifications"
+                data-channel-id="{{ $notification_channel_id }}"
+                data-index-url="{{ route('admin.notifications.index') }}"
+                data-mark-url-template="{{ route('admin.notifications.mark-as-read', ['notification' => '__ID__']) }}">
+                <div class="btn-group">
+                    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        class="btn btn-link p-0 position-relative">
+                        <i class="fa fa-bell fa-lg"></i>
+                        <span id="notificationUnreadCount"
+                            class="badge badge-danger position-absolute"
+                            style="top: -10px; right: -12px; {{ $unread_noti_count > 0 ? '' : 'display: none;' }}">
+                            {{ $unread_noti_count }}
+                        </span>
+                    </button>
+                    <div tabindex="-1" role="menu" aria-hidden="true"
+                        class="dropdown-menu dropdown-menu-right dropdown-menu-lg p-0">
+                        <div class="dropdown-menu-header">
+                            <div class="dropdown-menu-header-inner bg-info">
+                                <div class="menu-header-content text-left">
+                                    <div class="widget-heading text-white">Notifications</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="notificationDropdownList" class="list-group list-group-flush"
+                            style="max-height: 360px; overflow-y: auto;">
+                            @forelse ($header_notifications as $notification)
+                                <a href="{{ $notification->data['web_link'] ?? '#' }}"
+                                    class="list-group-item list-group-item-action notification-item {{ is_null($notification->read_at) ? 'font-weight-bold' : '' }}"
+                                    data-notification-id="{{ $notification->id }}">
+                                    <div class="small text-muted">
+                                        {{ $notification->created_at->format('Y-m-d h:i A') }}
+                                    </div>
+                                    <div>{{ $notification->data['title'] ?? 'Notification' }}</div>
+                                    <div class="small text-muted">
+                                        {{ Illuminate\Support\Str::limit($notification->data['message'] ?? '', 70) }}
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="list-group-item text-muted small" id="notificationEmptyState">
+                                    No notifications
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="header-btn-lg pr-0">
                 <div class="widget-content p-0">
                     <div class="widget-content-wrapper">

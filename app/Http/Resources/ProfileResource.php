@@ -2,7 +2,8 @@
 
 namespace App\Http\Resources;
 
-use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProfileResource extends JsonResource
@@ -10,13 +11,14 @@ class ProfileResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  Request  $request
+     * @return array|Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
 
         $unread_noti_count = $this->unreadNotifications()->count();
+
         return [
             'name' => $this->name,
             'email' => $this->email,

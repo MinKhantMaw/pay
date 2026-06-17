@@ -3,15 +3,23 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class GeneralNotification extends Notification
 {
     use Queueable;
 
-    protected $title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link;
+    protected $title;
+
+    protected $message;
+
+    protected $sourceable_id;
+
+    protected $sourceable_type;
+
+    protected $web_link;
+
+    protected $deep_link;
 
     /**
      * Create a new notification instance.

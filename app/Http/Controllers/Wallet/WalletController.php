@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Wallet;
 
-use Exception;
-use Carbon\Carbon;
+use App\Helpers\WalletGenerate;
+use App\Http\Controllers\Controller;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Transaction;
-use Illuminate\Http\Request;
-use App\Helpers\WalletGenerate;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
 use App\Notifications\GeneralNotification;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Yajra\DataTables\Facades\DataTables;
 
 class WalletController extends Controller
 {
@@ -30,8 +30,9 @@ class WalletController extends Controller
             ->addColumn('account_person', function ($e) {
                 $user = $e->user;
                 if ($user) {
-                    return '<p>Name : ' . $user->name . ' </p> <p>Email : ' . $user->email . ' </p> <p>Phone : ' . $user->phone . '</p>';
+                    return '<p>Name : '.$user->name.' </p> <p>Email : '.$user->email.' </p> <p>Phone : '.$user->phone.'</p>';
                 }
+
                 return '-';
             })
             ->editColumn('amount', function ($e) {
@@ -50,6 +51,7 @@ class WalletController extends Controller
     public function addAmount()
     {
         $users = User::orderBy('name', 'desc')->get();
+
         return view('backend.wallets.add_amount', ['users' => $users]);
     }
 
@@ -72,8 +74,6 @@ class WalletController extends Controller
             return back()->withErrors(['amount' => 'The amount must be as less than 1000']);
         }
 
-
-
         DB::beginTransaction();
         try {
             $to_account = User::with('wallet')->where('id', $request->user_id)->firstOrFail();
@@ -83,7 +83,7 @@ class WalletController extends Controller
 
             $ref_no = WalletGenerate::refNumber();
 
-            $to_account_transaction = new Transaction();
+            $to_account_transaction = new Transaction;
             $to_account_transaction->ref_no = $ref_no;
             $to_account_transaction->trx_id = WalletGenerate::trxId();
             $to_account_transaction->user_id = $to_account->id;
@@ -94,16 +94,19 @@ class WalletController extends Controller
             $to_account_transaction->save();
 
             DB::commit();
+
             return redirect()->route('wallet.index')->with('create', 'Successfully Add Admount');
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             DB::rollBack();
-            return back()->withErrors(['fail' => 'Something was wrong.' . $error->getMessage()])->withInput();
+
+            return back()->withErrors(['fail' => 'Something was wrong.'.$error->getMessage()])->withInput();
         }
     }
 
     public function reduceAmount()
     {
-        $users = User::orderBy("name")->get();
+        $users = User::orderBy('name')->get();
+
         return view('backend.wallets.reduce_amount', ['users' => $users]);
     }
 
@@ -129,14 +132,14 @@ class WalletController extends Controller
             $to_account_wallet = $to_account->wallet;
 
             if ($to_account_wallet->amount < $request->amount) {
-                throw new Exception("The amount is greater than the wallet balance.");
+                throw new Exception('The amount is greater than the wallet balance.');
             }
 
             $to_account_wallet->decrement('amount', $request->amount);
             $to_account_wallet->update();
 
             $ref_no = WalletGenerate::refNumber();
-            $to_account_transaction = new Transaction();
+            $to_account_transaction = new Transaction;
             $to_account_transaction->ref_no = $ref_no;
             $to_account_transaction->trx_id = WalletGenerate::trxId();
             $to_account_transaction->user_id = $to_account->id;
@@ -148,10 +151,10 @@ class WalletController extends Controller
 
             // To Noti
             $title = 'E-money Reduced!';
-            $message = 'Your wallet reduced ' . number_format($request->amount) . ' MMK by Magic Pay Super Admin.';
+            $message = 'Your wallet reduced '.number_format($request->amount).' MMK by Magic Pay Super Admin.';
             $sourceable_id = $to_account_transaction->id;
             $sourceable_type = Transaction::class;
-            $web_link = url('/transaction/' . $to_account_transaction->trx_id);
+            $web_link = url('/transaction/'.$to_account_transaction->trx_id);
             $deep_link = [
                 'target' => 'transaction_detail',
                 'parameter' => [
@@ -161,10 +164,12 @@ class WalletController extends Controller
             Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
 
             DB::commit();
+
             return redirect()->route('wallet.index')->with('create', 'Successfully reduced amount.');
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             DB::rollback();
-            return back()->withErrors(['fail' => 'Something wrong. ' . $error->getMessage()])->withInput();
+
+            return back()->withErrors(['fail' => 'Something wrong. '.$error->getMessage()])->withInput();
         }
     }
 }

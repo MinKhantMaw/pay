@@ -14,6 +14,7 @@ class WalletGenerate
         if (Wallet::where('account_number', $number)->exists()) {
             self::accountNumber();
         }
+
         return $number;
     }
 
@@ -24,6 +25,7 @@ class WalletGenerate
         if (Transaction::where('ref_no', $number)->exists()) {
             self::refNumber();
         }
+
         return $number;
     }
 
@@ -34,6 +36,7 @@ class WalletGenerate
         if (Transaction::where('trx_id', $number)->exists()) {
             self::trxID();
         }
+
         return $number;
     }
 }

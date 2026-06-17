@@ -3,9 +3,9 @@
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Frontend\NotificationController;
 use App\Http\Controllers\Frontend\PageController;
+use App\Http\Controllers\NotificationController as RealtimeNotificationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
 
 Auth::routes();
 
@@ -35,9 +35,14 @@ Route::middleware('auth')->controller(PageController::class)->group(function () 
 
 });
 
-Route::middleware('auth')->controller(NotificationController::class)->group(function(){
-    Route::get('notification','index')->name('notification');
-    Route::get('notification/{id}','show')->name('notificationShow');
+Route::middleware('auth')->controller(NotificationController::class)->group(function () {
+    Route::get('notification', 'index')->name('notification');
+    Route::get('notification/{id}', 'show')->name('notificationShow');
+});
+
+Route::middleware('auth')->name('notifications.')->group(function () {
+    Route::get('notifications/realtime', [RealtimeNotificationController::class, 'index'])->name('index');
+    Route::post('notifications/{notification}/read', [RealtimeNotificationController::class, 'markAsRead'])->name('mark-as-read');
 });
 
 Route::controller(AdminLoginController::class)->group(function () {

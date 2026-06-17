@@ -6,15 +6,17 @@ use Hashids\Hashids;
 
 class EncodeDecode
 {
-    public static function  idToHash($id)
+    public static function idToHash($id)
     {
         $hashids = new Hashids('this is my test');
+
         return $hashids->encode($id);
     }
 
-    public static function  hashToId($id)
+    public static function hashToId($id)
     {
         $hashids = new Hashids('this is my test');
+
         return $hashids->decode($id)[0];
     }
 }

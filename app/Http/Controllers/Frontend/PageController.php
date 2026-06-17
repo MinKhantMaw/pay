@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Models\User;
-use App\Models\Transaction;
-use Illuminate\Http\Request;
 use App\Helpers\WalletGenerate;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\UpdatePassword;
 use App\Http\Requests\TransferFormValidate;
+use App\Http\Requests\UpdatePassword;
+use App\Models\Transaction;
+use App\Models\User;
 use App\Notifications\GeneralNotification;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
 class PageController extends Controller
@@ -35,6 +36,7 @@ class PageController extends Controller
     public function profile()
     {
         $user = Auth::guard('web')->user();
+
         return view('frontend.profile', ['user' => $user]);
     }
 
@@ -75,6 +77,7 @@ class PageController extends Controller
     public function wallet()
     {
         $auth_user = auth()->guard('web')->user();
+
         // return $auth_user;
         return view('frontend.wallet', ['auth_user' => $auth_user]);
     }
@@ -82,6 +85,7 @@ class PageController extends Controller
     public function transfer()
     {
         $auth_user = auth()->guard('web')->user();
+
         return view('frontend.transfer', ['auth_user' => $auth_user]);
     }
 
@@ -110,18 +114,17 @@ class PageController extends Controller
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return back()->withErrors(['to_phone' => 'To account is invalid.'])->withInput();
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return back()->withErrors(['fail' => 'The given data is invalid.'])->withInput();
         }
 
         if ($from_account->wallet->amount < $amount) {
             return back()->withErrors(['amount' => 'The amount is not enough.'])->withInput();
         }
-
 
         return view('frontend.transfer_confirm', ['from_account' => $from_account, 'to_account' => $to_account, 'amount' => $amount, 'description' => $description, 'hash_value' => $hash_value]);
     }
@@ -145,17 +148,16 @@ class PageController extends Controller
             return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
         }
 
-
         if ($from_account == $to_phone) {
             return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
         }
 
@@ -175,7 +177,7 @@ class PageController extends Controller
 
             $ref_no = WalletGenerate::refNumber();
 
-            $from_account_transaction = new Transaction();
+            $from_account_transaction = new Transaction;
             $from_account_transaction->ref_no = $ref_no;
             $from_account_transaction->trx_id = WalletGenerate::trxId();
             $from_account_transaction->user_id = $from_account->id;
@@ -185,7 +187,7 @@ class PageController extends Controller
             $from_account_transaction->description = $description;
             $from_account_transaction->save();
 
-            $to_account_transaction = new Transaction();
+            $to_account_transaction = new Transaction;
             $to_account_transaction->ref_no = $ref_no;
             $to_account_transaction->trx_id = WalletGenerate::trxId();
             $to_account_transaction->user_id = $to_account->id;
@@ -195,40 +197,37 @@ class PageController extends Controller
             $to_account_transaction->description = $description;
             $to_account_transaction->save();
 
-            // From Notification
-            $title = 'Transfer To';
-            $message = 'Your transfer ' . number_format($amount) . ' MMK to ' . $to_account->name . ' (' . $to_account->phone . ')';
-            $sourceable_id = $from_account_transaction->id;
-            $sourceable_type = Transaction::class;
-            $web_link = url('/transactions/' . $from_account_transaction->trx_id);
-            $deep_link = [
-                'target' => 'transaction_detail',
-                'parameter' => [
-                    'tax_id' => $from_account_transaction->trx_id,
-                ],
-            ];
-            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+            $notificationService = app(NotificationService::class);
 
-            // To Notification
-            $title = 'Recieve From';
-            $message = 'Your Recieve ' . number_format($amount) . ' MMK from ' .  $from_account->name  . ' (' . $from_account->phone . ')';
-            $sourceable_id = $to_account_transaction->id;
-            $sourceable_type = Transaction::class;
-            $web_link =  url('/transactions/' . $to_account_transaction->trx_id);
-            $deep_link = [
-                'target' => 'transaction_detail',
-                'parameter' => [
-                    'tax_id' => $to_account_transaction->trx_id,
+            $notificationService->notify($from_account, 'Transfer To', 'Your transfer '.number_format($amount).' MMK to '.$to_account->name.' ('.$to_account->phone.')', url('/transactions/'.$from_account_transaction->trx_id), [
+                'sourceable_id' => $from_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $from_account_transaction->trx_id,
+                    ],
                 ],
-            ];
-            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+            ]);
+
+            $notificationService->notify($to_account, 'Receive From', 'Your receive '.number_format($amount).' MMK from '.$from_account->name.' ('.$from_account->phone.')', url('/transactions/'.$to_account_transaction->trx_id), [
+                'sourceable_id' => $to_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $to_account_transaction->trx_id,
+                    ],
+                ],
+            ]);
 
             DB::commit();
 
-            return redirect('/transactions/' . $from_account_transaction->trx_id)->with('transfer_success', 'Successfully transferred');
+            return redirect('/transactions/'.$from_account_transaction->trx_id)->with('transfer_success', 'Successfully transferred');
         } catch (\Exception  $error) {
             DB::rollBack();
-            return back()->withErrors(['fail' => 'Something was wrong.' . $error->getMessage()])->withInput();
+
+            return back()->withErrors(['fail' => 'Something was wrong.'.$error->getMessage()])->withInput();
         }
     }
 
@@ -245,6 +244,7 @@ class PageController extends Controller
                 ]);
             }
         }
+
         return response()->json([
             'status' => 'fail',
             'message' => 'Invalid phone number',
@@ -253,7 +253,7 @@ class PageController extends Controller
 
     public function passwordCheck(Request $request)
     {
-        if (!$request->password) {
+        if (! $request->password) {
             return response()->json([
                 'status' => 'fail',
                 'message' => 'Please enter a password',
@@ -266,6 +266,7 @@ class PageController extends Controller
                 'message' => 'The password is correct',
             ]);
         }
+
         return response()->json([
             'status' => 'fail',
             'message' => 'The password is incorrect',
@@ -286,6 +287,7 @@ class PageController extends Controller
         }
 
         $transactions = $transactions->paginate(5);
+
         return view('frontend.transactions', ['transactions' => $transactions]);
     }
 
@@ -293,13 +295,15 @@ class PageController extends Controller
     {
         $authUser = Auth::guard('web')->user();
         $transactionDetail = Transaction::with(['user', 'source'])->where('user_id', $authUser->id)->where('trx_id', $trx_id)->first();
+
         return view('frontend.transactionDetail', ['transactionDetail' => $transactionDetail]);
     }
 
     public function transferHash(Request $request)
     {
-        $str = $request->to_phone . $request->amount . $request->description;
+        $str = $request->to_phone.$request->amount.$request->description;
         $hash_value = hash_hmac('sha256', $str, 'magicpay@123 ');
+
         return response()->json([
             'status' => 'success',
             'data' => $hash_value,
@@ -309,6 +313,7 @@ class PageController extends Controller
     public function receiveQR()
     {
         $authUser = auth()->guard('web')->user();
+
         return view('frontend.receive_qr', ['authUser' => $authUser]);
     }
 
@@ -321,7 +326,7 @@ class PageController extends Controller
     {
         $from_account = auth()->guard('web')->user();
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return back()->withErrors(['fail' => 'QR is invalid...!']);
         }
 
@@ -352,11 +357,11 @@ class PageController extends Controller
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return back()->withErrors(['to_phone' => 'To account is invalid.'])->withInput();
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return back()->withErrors(['fail' => 'The given data is invalid.'])->withInput();
         }
 
@@ -386,17 +391,16 @@ class PageController extends Controller
             return back()->withErrors(['amount' => 'The amount must be greater than 1000 MMK'])->withInput();
         }
 
-
         if ($from_account == $to_phone) {
             return back()->withErrors(['to_phone' => 'To account is invalid..!'])->withInput();
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return back()->withErrors(['to_phone' => 'This phone number is not opening account'])->withInput();
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
         }
 
@@ -416,7 +420,7 @@ class PageController extends Controller
 
             $ref_no = WalletGenerate::refNumber();
 
-            $from_account_transaction = new Transaction();
+            $from_account_transaction = new Transaction;
             $from_account_transaction->ref_no = $ref_no;
             $from_account_transaction->trx_id = WalletGenerate::trxId();
             $from_account_transaction->user_id = $from_account->id;
@@ -426,7 +430,7 @@ class PageController extends Controller
             $from_account_transaction->description = $description;
             $from_account_transaction->save();
 
-            $to_account_transaction = new Transaction();
+            $to_account_transaction = new Transaction;
             $to_account_transaction->ref_no = $ref_no;
             $to_account_transaction->trx_id = WalletGenerate::trxId();
             $to_account_transaction->user_id = $to_account->id;
@@ -436,12 +440,37 @@ class PageController extends Controller
             $to_account_transaction->description = $description;
             $to_account_transaction->save();
 
+            $notificationService = app(NotificationService::class);
+
+            $notificationService->notify($from_account, 'Scan & Pay Transfer', 'Your scan & pay transfer '.number_format($amount).' MMK to '.$to_account->name.' ('.$to_account->phone.')', url('/transactions/'.$from_account_transaction->trx_id), [
+                'sourceable_id' => $from_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $from_account_transaction->trx_id,
+                    ],
+                ],
+            ]);
+
+            $notificationService->notify($to_account, 'Scan & Pay Received', 'Your wallet received '.number_format($amount).' MMK from '.$from_account->name.' ('.$from_account->phone.')', url('/transactions/'.$to_account_transaction->trx_id), [
+                'sourceable_id' => $to_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $to_account_transaction->trx_id,
+                    ],
+                ],
+            ]);
+
             DB::commit();
 
-            return redirect('/transactions/' . $from_account_transaction->trx_id)->with('transfer_success', 'Successfully transferred');
+            return redirect('/transactions/'.$from_account_transaction->trx_id)->with('transfer_success', 'Successfully transferred');
         } catch (\Exception  $error) {
             DB::rollBack();
-            return back()->withErrors(['fail' => 'Something was wrong.' . $error->getMessage()])->withInput();
+
+            return back()->withErrors(['fail' => 'Something was wrong.'.$error->getMessage()])->withInput();
         }
     }
 }

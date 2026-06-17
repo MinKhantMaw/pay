@@ -81,6 +81,7 @@
 
     {{-- sweet alert cdn --}}
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @vite('resources/js/app.js')
 
     <script>
         $(document).ready(function() {

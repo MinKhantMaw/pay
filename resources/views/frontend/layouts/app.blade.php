@@ -27,6 +27,11 @@
 
 <body>
     <div id="app">
+        <div id="realtime-notifications" class="d-none"
+            data-channel-id="{{ $notification_channel_id }}"
+            data-index-url="{{ route('notifications.index') }}"
+            data-mark-url-template="{{ route('notifications.mark-as-read', ['notification' => '__ID__']) }}">
+        </div>
         <div class="header-menu">
             <div class="d-flex justify-content-center">
                 <div class="col-md-8">
@@ -124,6 +129,7 @@
 
 
     <script src="{{ asset('assets/frontend/js/jsscroll.min.js') }}"></script>
+    @vite('resources/js/app.js')
     <script>
         $(document).ready(function() {
             let token = document.head.querySelector('meta[name="csrf-token"]');

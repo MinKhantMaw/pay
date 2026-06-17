@@ -27,7 +27,14 @@ class StoreUser extends FormRequest
             'name' => 'required',
             'email' => 'required|unique:users,email',
             'phone' => 'required|unique:users,phone|min:11|max:20',
-            'password' => 'required|min:6|max:15'
+            'password' => ['required', 'string', 'min:6', 'max:15', 'confirmed', 'regex:/^[0-9]+$/'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'password.regex' => 'Password must contain numbers only.',
         ];
     }
 }

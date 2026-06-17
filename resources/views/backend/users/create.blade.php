@@ -35,7 +35,16 @@
                     </div>
                     <div class="form-group">
                         <label for="">Password</label>
-                        <input type="password" name="password" class="form-control" id="">
+                        <input type="password" name="password" class="form-control" id="password"
+                            inputmode="numeric" pattern="[0-9]*" maxlength="15" autocomplete="new-password"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="form-control"
+                            id="password_confirmation" inputmode="numeric" pattern="[0-9]*" maxlength="15"
+                            autocomplete="new-password"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="d-flex justify-content-center">
                         <button type="submit" class="btn btn-success mr-2" id=""> Save </button>
@@ -52,7 +61,9 @@
 
     <script>
         $(document).ready(function() {
-
+            $('#password, #password_confirmation').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
         });
     </script>
 @endsection

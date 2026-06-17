@@ -27,7 +27,7 @@ class StoreAdminUser extends FormRequest
             'name' => 'required',
             'email' => 'required|unique:admin_users,email',
             'phone' => 'required|unique:admin_users,phone|min:11|max:20',
-            'password' => 'required|min:6|max:15'
+            'password' => 'required|min:6|max:15',
         ];
     }
 }

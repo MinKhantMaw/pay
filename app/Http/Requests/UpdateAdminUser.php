@@ -24,10 +24,11 @@ class UpdateAdminUser extends FormRequest
     public function rules()
     {
         $id = $this->route('admin_user');
+
         return [
             'name' => 'required',
-            'email' => 'required|unique:admin_users,email,' . $id,
-            'phone' => 'required|unique:admin_users,phone|min:11|max:20,' . $id,
+            'email' => 'required|unique:admin_users,email,'.$id,
+            'phone' => 'required|unique:admin_users,phone|min:11|max:20,'.$id,
         ];
     }
 }

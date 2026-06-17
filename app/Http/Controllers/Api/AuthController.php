@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ApiResponse;
+use App\Helpers\WalletGenerate;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TransferFormValidate;
+use App\Http\Resources\NotificationDetailResource;
+use App\Http\Resources\NotificationResource;
+use App\Http\Resources\ProfileResource;
+use App\Http\Resources\TransactionDetailResource;
+use App\Http\Resources\TransactionResource;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Transaction;
-use App\Helpers\ApiResponse;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
-use App\Helpers\WalletGenerate;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Resources\ProfileResource;
-use App\Notifications\GeneralNotification;
-use App\Http\Requests\TransferFormValidate;
-use App\Http\Resources\TransactionResource;
-use App\Http\Resources\NotificationResource;
-use Illuminate\Support\Facades\Notification;
-use App\Http\Resources\TransactionDetailResource;
-use App\Http\Resources\NotificationDetailResource;
 
 class AuthController extends Controller
 {
@@ -32,7 +31,7 @@ class AuthController extends Controller
             'password' => 'required|min:6|max:20',
         ]);
 
-        $user = new User();
+        $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
@@ -55,7 +54,6 @@ class AuthController extends Controller
 
         );
 
-
         $token = $user->createToken('Pay Mal')->accessToken;
 
         return response()->json([
@@ -64,7 +62,7 @@ class AuthController extends Controller
             'authorisation' => [
                 'token' => $token,
                 'type' => 'bearer',
-            ]
+            ],
         ]);
     }
 
@@ -72,7 +70,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'phone' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         if (Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
@@ -97,13 +95,14 @@ class AuthController extends Controller
             );
 
             $token = $user->createToken('Pay Mal')->accessToken;
+
             return response()->json([
                 'status' => 'Login Successfully',
                 'data' => $user,
                 'authorisation' => [
                     'token' => $token,
                     'type' => 'bearer',
-                ]
+                ],
             ]);
         }
 
@@ -116,6 +115,7 @@ class AuthController extends Controller
     {
         $user = auth()->user();
         $data = new ProfileResource($user);
+
         return ApiResponse::success('Your profile has been Fetch', $data, 200);
     }
 
@@ -123,6 +123,7 @@ class AuthController extends Controller
     {
         $user = auth()->user();
         $user->token()->revoke();
+
         return ApiResponse::success('Logout Successful', null, 200);
     }
 
@@ -142,6 +143,7 @@ class AuthController extends Controller
         $transaction = $transaction->paginate(5);
 
         $transaction_resource = TransactionResource::collection($transaction)->additional(['message' => 'Fetch Transaction Successfully']);
+
         return $transaction_resource;
     }
 
@@ -150,6 +152,7 @@ class AuthController extends Controller
         $authUser = auth()->user();
         $transaction_detail = Transaction::with(['user', 'source'])->where('trx_id', $trx_id)->where('user_id', $authUser->id)->firstOrFail();
         $data = new TransactionDetailResource($transaction_detail);
+
         return ApiResponse::success('Fetch Transaction Detail', $data, 200);
     }
 
@@ -158,7 +161,7 @@ class AuthController extends Controller
         $authUser = auth()->user();
         $notifications = $authUser->notifications()->paginate(5);
 
-        return NotificationResource::collection($notifications)->additional(['message' => 'Fetch Notifications',]);
+        return NotificationResource::collection($notifications)->additional(['message' => 'Fetch Notifications']);
     }
 
     public function notificationDetail($id)
@@ -214,11 +217,11 @@ class AuthController extends Controller
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return ApiResponse::fail('To account is invalid.', null, 422);
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return ApiResponse::fail('The given data is invalid.', null, 422);
         }
 
@@ -241,12 +244,12 @@ class AuthController extends Controller
 
     public function transferComplete(TransferFormValidate $request)
     {
-        if (!$request->password) {
+        if (! $request->password) {
             return ApiResponse::fail('Please fill your password.', null, 422);
         }
 
         $authUser = auth()->user();
-        if (!Hash::check($request->password, $authUser->password)) {
+        if (! Hash::check($request->password, $authUser->password)) {
             return ApiResponse::fail('The password is incorrect.', null, 422);
         }
 
@@ -271,11 +274,11 @@ class AuthController extends Controller
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return ApiResponse::fail('To account is invalid.', null, 422);
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return ApiResponse::fail('The given data is invalid.', null, 422);
         }
 
@@ -294,7 +297,7 @@ class AuthController extends Controller
             $to_account_wallet->update();
 
             $ref_no = WalletGenerate::refNumber();
-            $from_account_transaction = new Transaction();
+            $from_account_transaction = new Transaction;
             $from_account_transaction->ref_no = $ref_no;
             $from_account_transaction->trx_id = WalletGenerate::trxId();
             $from_account_transaction->user_id = $from_account->id;
@@ -304,7 +307,7 @@ class AuthController extends Controller
             $from_account_transaction->description = $description;
             $from_account_transaction->save();
 
-            $to_account_transaction = new Transaction();
+            $to_account_transaction = new Transaction;
             $to_account_transaction->ref_no = $ref_no;
             $to_account_transaction->trx_id = WalletGenerate::trxId();
             $to_account_transaction->user_id = $to_account->id;
@@ -314,40 +317,37 @@ class AuthController extends Controller
             $to_account_transaction->description = $description;
             $to_account_transaction->save();
 
-            // From Noti
-            $title = 'E-money Transfered!';
-            $message = 'Your wallet transfered ' . number_format($amount) . ' MMK to ' . $to_account->name . ' ( ' . $to_account->phone . ' )';
-            $sourceable_id = $from_account_transaction->id;
-            $sourceable_type = Transaction::class;
-            $web_link = url('/transaction/' . $from_account_transaction->trx_id);
-            $deep_link = [
-                'target' => 'transaction_detail',
-                'parameter' => [
-                    'trx_id' => $from_account_transaction->trx_id,
-                ],
-            ];
-            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+            $notificationService = app(NotificationService::class);
 
-            // To Noti
-            $title = 'E-money Received!';
-            $message = 'Your wallet received ' . number_format($amount) . ' MMK from ' . $from_account->name . ' ( ' . $from_account->phone . ' )';
-            $sourceable_id = $to_account_transaction->id;
-            $sourceable_type = Transaction::class;
-            $web_link = url('/transaction/' . $to_account_transaction->trx_id);
-            $deep_link = [
-                'target' => 'transaction_detail',
-                'parameter' => [
-                    'trx_id' => $to_account_transaction->trx_id,
+            $notificationService->notify($from_account, 'E-money Transferred!', 'Your wallet transferred '.number_format($amount).' MMK to '.$to_account->name.' ( '.$to_account->phone.' )', url('/transactions/'.$from_account_transaction->trx_id), [
+                'sourceable_id' => $from_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $from_account_transaction->trx_id,
+                    ],
                 ],
-            ];
-            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+            ]);
+
+            $notificationService->notify($to_account, 'E-money Received!', 'Your wallet received '.number_format($amount).' MMK from '.$from_account->name.' ( '.$from_account->phone.' )', url('/transactions/'.$to_account_transaction->trx_id), [
+                'sourceable_id' => $to_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $to_account_transaction->trx_id,
+                    ],
+                ],
+            ]);
 
             DB::commit();
 
             return ApiResponse::success('Successfully Transfered', ['trx_id' => $from_account_transaction->trx_id], 200);
         } catch (\Exception $error) {
             DB::rollback();
-            return ApiResponse::fail('Something wrong. ' . $error->getMessage(), null, 422);
+
+            return ApiResponse::fail('Something wrong. '.$error->getMessage(), null, 422);
         }
     }
 
@@ -355,7 +355,7 @@ class AuthController extends Controller
     {
         $from_account = auth()->user();
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return ApiResponse::fail('You have no account to scan.', $to_account, 422);
         }
 
@@ -395,11 +395,11 @@ class AuthController extends Controller
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return ApiResponse::fail('To account is invalid.', null, 422);
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return ApiResponse::fail('The given data is invalid.', null, 422);
         }
 
@@ -422,12 +422,12 @@ class AuthController extends Controller
 
     public function scanAndPayComplete(TransferFormValidate $request)
     {
-        if (!$request->password) {
+        if (! $request->password) {
             return ApiResponse::fail('Please fill your password.', null, 422);
         }
 
         $authUser = auth()->user();
-        if (!Hash::check($request->password, $authUser->password)) {
+        if (! Hash::check($request->password, $authUser->password)) {
             return ApiResponse::fail('The password is incorrect.', null, 422);
         }
 
@@ -452,11 +452,11 @@ class AuthController extends Controller
         }
 
         $to_account = User::where('phone', $request->to_phone)->first();
-        if (!$to_account) {
+        if (! $to_account) {
             return ApiResponse::fail('To account is invalid.', null, 422);
         }
 
-        if (!$from_account->wallet || !$to_account->wallet) {
+        if (! $from_account->wallet || ! $to_account->wallet) {
             return ApiResponse::fail('The given data is invalid.', null, 422);
         }
 
@@ -475,7 +475,7 @@ class AuthController extends Controller
             $to_account_wallet->update();
 
             $ref_no = WalletGenerate::refNumber();
-            $from_account_transaction = new Transaction();
+            $from_account_transaction = new Transaction;
             $from_account_transaction->ref_no = $ref_no;
             $from_account_transaction->trx_id = WalletGenerate::trxId();
             $from_account_transaction->user_id = $from_account->id;
@@ -485,7 +485,7 @@ class AuthController extends Controller
             $from_account_transaction->description = $description;
             $from_account_transaction->save();
 
-            $to_account_transaction = new Transaction();
+            $to_account_transaction = new Transaction;
             $to_account_transaction->ref_no = $ref_no;
             $to_account_transaction->trx_id = WalletGenerate::trxId();
             $to_account_transaction->user_id = $to_account->id;
@@ -495,40 +495,37 @@ class AuthController extends Controller
             $to_account_transaction->description = $description;
             $to_account_transaction->save();
 
-            // From Noti
-            $title = 'E-money Transfered!';
-            $message = 'Your wallet transfered ' . number_format($amount) . ' MMK to ' . $to_account->name . ' ( ' . $to_account->phone . ' )';
-            $sourceable_id = $from_account_transaction->id;
-            $sourceable_type = Transaction::class;
-            $web_link = url('/transaction/' . $from_account_transaction->trx_id);
-            $deep_link = [
-                'target' => 'transaction_detail',
-                'parameter' => [
-                    'trx_id' => $from_account_transaction->trx_id,
-                ],
-            ];
-            Notification::send([$from_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+            $notificationService = app(NotificationService::class);
 
-            // To Noti
-            $title = 'E-money Received!';
-            $message = 'Your wallet received ' . number_format($amount) . ' MMK from ' . $from_account->name . ' ( ' . $from_account->phone . ' )';
-            $sourceable_id = $to_account_transaction->id;
-            $sourceable_type = Transaction::class;
-            $web_link = url('/transaction/' . $to_account_transaction->trx_id);
-            $deep_link = [
-                'target' => 'transaction_detail',
-                'parameter' => [
-                    'trx_id' => $to_account_transaction->trx_id,
+            $notificationService->notify($from_account, 'E-money Transferred!', 'Your wallet transferred '.number_format($amount).' MMK to '.$to_account->name.' ( '.$to_account->phone.' )', url('/transactions/'.$from_account_transaction->trx_id), [
+                'sourceable_id' => $from_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $from_account_transaction->trx_id,
+                    ],
                 ],
-            ];
-            Notification::send([$to_account], new GeneralNotification($title, $message, $sourceable_id, $sourceable_type, $web_link, $deep_link));
+            ]);
+
+            $notificationService->notify($to_account, 'E-money Received!', 'Your wallet received '.number_format($amount).' MMK from '.$from_account->name.' ( '.$from_account->phone.' )', url('/transactions/'.$to_account_transaction->trx_id), [
+                'sourceable_id' => $to_account_transaction->id,
+                'sourceable_type' => Transaction::class,
+                'deep_link' => [
+                    'target' => 'transaction_detail',
+                    'parameter' => [
+                        'trx_id' => $to_account_transaction->trx_id,
+                    ],
+                ],
+            ]);
 
             DB::commit();
 
             return ApiResponse::success('Successfully Transfered', ['trx_id' => $from_account_transaction->trx_id], 200);
         } catch (\Exception $error) {
             DB::rollback();
-            return ApiResponse::fail('Something wrong. ' . $error->getMessage(), null, 422);
+
+            return ApiResponse::fail('Something wrong. '.$error->getMessage(), null, 422);
         }
     }
 }
