@@ -29,6 +29,8 @@
                             <thead>
                                 <tr class="bg-light">
                                     <th>Name</th>
+                                    <th>Profile</th>
+                                    <th>Status</th>
                                     <th>Email</th>
                                     <th>Phone</th>
                                     <th>IP</th>
@@ -64,6 +66,16 @@
                         sortable: false,
                     },
                     {
+                        data: 'profile',
+                        name: 'profile',
+                        searchable: false,
+                        sortable: false,
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                    },
+                    {
                         data: 'email',
                         name: 'email',
                     },
@@ -89,7 +101,7 @@
                     },
                 ],
                 columnDefs: [{
-                        targets: [0, 1, 2, 3, 4],
+                        targets: [0, 1, 2, 3, 4, 5, 6],
                         sortable: false,
                     },
 

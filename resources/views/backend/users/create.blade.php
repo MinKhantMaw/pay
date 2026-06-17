@@ -19,19 +19,32 @@
         <div class="card">
             <div class="card-body">
                 @include('backend.layouts.flag')
-                <form action="{{ route('user.user.store') }}" method="POST" id="create">
+                <form action="{{ route('user.user.store') }}" method="POST" id="create" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group">
                         <label for="">Name</label>
-                        <input type="text" name="name" class="form-control" id="">
+                        <input type="text" name="name" value="{{ old('name') }}" class="form-control" id="">
                     </div>
                     <div class="form-group">
                         <label for="">Email</label>
-                        <input type="email" name="email" class="form-control" id="">
+                        <input type="email" name="email" value="{{ old('email') }}" class="form-control" id="">
                     </div>
                     <div class="form-group">
                         <label for="">Phone</label>
-                        <input type="phone" name="phone" class="form-control" id="">
+                        <input type="phone" name="phone" value="{{ old('phone') }}" class="form-control" id="">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile">Profile Image</label>
+                        <input type="file" name="profile" class="form-control" id="profile" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select name="status" class="form-control" id="status" required>
+                            <option value="{{ \App\Enums\UserStatus::Active->value }}"
+                                @selected(old('status', \App\Enums\UserStatus::Active->value) === \App\Enums\UserStatus::Active->value)>Active</option>
+                            <option value="{{ \App\Enums\UserStatus::InActive->value }}"
+                                @selected(old('status') === \App\Enums\UserStatus::InActive->value)>InActive</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="">Password</label>

@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Helpers\WalletGenerate;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUser;
 use App\Http\Requests\UpdateUser;
 use App\Models\User;
-use App\Models\Wallet;
-use App\Services\NotificationService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Jenssegers\Agent\Agent;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -33,6 +29,19 @@ class UserController extends Controller
         $users = User::query();
 
         return DataTables::of($users)
+            ->addColumn('profile', function ($e) {
+                $profileUrl = $e->profile
+                    ? asset('storage/'.$e->profile)
+                    : 'https://ui-avatars.com/api/?name='.urlencode($e->name).'&background=0D8ABC&color=fff';
+
+                return '<img src="'.$profileUrl.'" alt="'.e($e->name).'" class="rounded-circle" width="42" height="42" style="object-fit: cover;">';
+            })
+            ->addColumn('status', function ($e) {
+                $status = $e->status?->value ?? 'InActive';
+                $badgeClass = $e->status?->badgeClass() ?? 'badge-danger';
+
+                return '<span class="badge '.$badgeClass.'">'.$status.'</span>';
+            })
             ->editColumn('user_agent', function ($e) {
                 if ($e->user_agent) {
                     $agent = new Agent;
@@ -53,12 +62,13 @@ class UserController extends Controller
                 return '-';
             })
             ->addColumn('action', function ($each) {
+                $show_icon = '<a href="'.route('user.user.show', $each->id).'" class="text-info"><i class="fas fa-eye"></i></a>';
                 $edit_icon = '<a href="'.route('user.user.edit', $each->id).'" class="text-warning"><i class="fas fa-edit"></i></a>';
                 $delete_icon = '<a href="#" class="text-danger delete" data-id="'.$each->id.'"><i class="fas fa-trash"></i></a>';
 
-                return '<div class="action-icon">'.$edit_icon.$delete_icon.'</div>';
+                return '<div class="action-icon">'.$show_icon.$edit_icon.$delete_icon.'</div>';
             })
-            ->rawColumns(['user_agent', 'action'])
+            ->rawColumns(['profile', 'status', 'user_agent', 'action'])
             ->make(true);
     }
 
@@ -78,40 +88,13 @@ class UserController extends Controller
      * @param  Request  $request
      * @return Response
      */
-    public function store(StoreUser $request)
+    public function store(StoreUser $request, UserService $userService)
     {
-
-        DB::beginTransaction();
         try {
-
-            $user = new User;
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->phone = $request->phone;
-            $user->password = Hash::make($request->password);
-
-            $user->save();
-
-            Wallet::firstOrCreate(
-
-                [
-                    'user_id' => $user->id,
-                ],
-
-                [
-                    'account_number' => WalletGenerate::accountNumber(),
-                    'amount' => 0,
-                ]
-
-            );
-            app(NotificationService::class)->notifyUserCreated($user);
-
-            DB::commit();
+            $userService->create($request->validated());
 
             return redirect()->route('user.user.index')->with('create', 'Successfully Created');
         } catch (\Exception $err) {
-            DB::rollBack();
-
             return back()->withErrors(['fails' => 'Account Create not success !'])->withInput();
         }
     }
@@ -124,7 +107,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::with('wallet')->findOrFail($id);
+
+        return view('backend.users.show', compact('user'));
     }
 
     /**
@@ -147,36 +132,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update(UpdateUser $request, $id)
+    public function update(UpdateUser $request, $id, UserService $userService)
     {
-        DB::beginTransaction();
         try {
-            // code...
             $user = User::findOrFail($id);
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->phone = $request->phone;
-            $user->update();
-
-            Wallet::firstOrCreate(
-
-                [
-                    'user_id' => $user->id,
-                ],
-
-                [
-                    'account_number' => WalletGenerate::accountNumber(),
-                    'amount' => 0,
-                ]
-
-            );
-            DB::commit();
+            $userService->update($user, $request->validated());
 
             return redirect()->route('user.user.index')->with('update', 'User was Successfully Update');
         } catch (\Exception $e) {
-            // throw $e;
-            DB::rollBack();
-
             return back()->withErrors(['fails' => 'This Account is already exit...!'.$e->getMessage()])->withInput();
         }
     }

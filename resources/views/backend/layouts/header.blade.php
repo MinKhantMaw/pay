@@ -54,8 +54,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="notificationDropdownList" class="list-group list-group-flush"
-                            style="max-height: 360px; overflow-y: auto;">
+                        <div id="notificationDropdownList" class="list-group list-group-flush notification-dropdown-list">
                             @forelse ($header_notifications as $notification)
                                 <a href="{{ $notification->data['web_link'] ?? '#' }}"
                                     class="list-group-item list-group-item-action notification-item {{ is_null($notification->read_at) ? 'font-weight-bold' : '' }}"

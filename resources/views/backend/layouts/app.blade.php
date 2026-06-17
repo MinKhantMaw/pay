@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/responsive.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;700&display=swap"
@@ -36,6 +37,7 @@
 
 <body>
     <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
+        <div class="admin-sidebar-overlay"></div>
         @include('backend.layouts.header')
 
         <div class="app-main">
@@ -117,6 +119,40 @@
                     title: '{{ session('update') }}'
                 })
             @endif
+
+            $.extend(true, $.fn.dataTable.defaults, {
+                scrollX: true,
+                autoWidth: false,
+                language: {
+                    search: '',
+                    searchPlaceholder: 'Search'
+                }
+            });
+
+            const closeMobileSidebar = function() {
+                $('body').removeClass('admin-sidebar-open');
+                $('.mobile-toggle-nav, .close-sidebar-btn').removeClass('is-active');
+            };
+
+            $('.mobile-toggle-nav, .close-sidebar-btn').on('click', function() {
+                if (window.matchMedia('(max-width: 767.98px)').matches) {
+                    $('body').toggleClass('admin-sidebar-open');
+                    $('.mobile-toggle-nav, .close-sidebar-btn').toggleClass('is-active', $('body').hasClass(
+                        'admin-sidebar-open'));
+                }
+            });
+
+            $('.admin-sidebar-overlay, .app-sidebar .vertical-nav-menu a').on('click', function() {
+                if (window.matchMedia('(max-width: 767.98px)').matches) {
+                    closeMobileSidebar();
+                }
+            });
+
+            $(window).on('resize', function() {
+                if (!window.matchMedia('(max-width: 767.98px)').matches) {
+                    closeMobileSidebar();
+                }
+            });
 
         });
     </script>

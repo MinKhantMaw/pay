@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,10 +22,14 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'profile',
+        'status',
         'ip',
         'user_agent',
         'login_at',
         'password',
+        'failed_login_attempts',
+        'locked_until',
     ];
 
     public function wallet()
@@ -49,5 +54,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'status' => UserStatus::class,
+        'failed_login_attempts' => 'integer',
+        'locked_until' => 'datetime',
     ];
 }

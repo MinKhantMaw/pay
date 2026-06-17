@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUser extends FormRequest
 {
@@ -23,12 +25,26 @@ class UpdateUser extends FormRequest
      */
     public function rules()
     {
-        $id = $this->route('user');
+        $user = $this->route('user');
+
+        $userId = is_object($user) ? $user->getKey() : $user;
 
         return [
-            'name' => 'required',
-            'email' => 'required|unique:admin_users,email,'.$id,
-            'phone' => 'required|unique:admin_users,phone|min:11|max:20,'.$id,
+            'name' => ['required', 'string'],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')->ignore($userId),
+            ],
+            'phone' => [
+                'required',
+                'string',
+                'min:11',
+                'max:20',
+                Rule::unique('users', 'phone')->ignore($userId),
+            ],
+            'profile' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'status' => ['required', Rule::in([UserStatus::Active->value, UserStatus::InActive->value])],
         ];
     }
 }
