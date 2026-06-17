@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\WalletGenerate;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Models\User;
 use App\Models\Wallet;
 use App\Providers\RouteServiceProvider;
+use App\Services\LoginSecurityService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -55,6 +60,38 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         return view('auth.login');
+    }
+
+    public function login(LoginRequest $request, LoginSecurityService $loginSecurityService)
+    {
+        $user = User::where($this->username(), $request->input($this->username()))->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                $this->username() => [trans('auth.failed')],
+            ]);
+        }
+
+        if ($blockMessage = $loginSecurityService->blockMessage($user)) {
+            throw ValidationException::withMessages([
+                $this->username() => [$blockMessage],
+            ]);
+        }
+
+        if (! Hash::check($request->password, $user->password)) {
+            $message = $loginSecurityService->recordFailedAttempt($user);
+
+            throw ValidationException::withMessages([
+                $this->username() => [$message],
+            ]);
+        }
+
+        $loginSecurityService->clearFailedAttempts($user);
+
+        $this->guard()->login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        return $this->authenticated($request, $user) ?: redirect()->intended($this->redirectPath());
     }
 
     protected function authenticated(Request $request, $user)

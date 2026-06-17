@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserStatus;
 use App\Helpers\WalletGenerate;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -70,6 +71,8 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
+            'status' => UserStatus::Active,
+            'failed_login_attempts' => 0,
             'password' => Hash::make($data['password']),
         ]);
     }

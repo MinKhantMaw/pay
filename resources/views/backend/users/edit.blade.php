@@ -19,7 +19,7 @@
         <div class="card">
             <div class="card-body">
                 @include('backend.layouts.flag')
-                <form action="{{ route('user.user.update', $user->id) }}" method="POST" id="update">
+                <form action="{{ route('user.user.update', $user->id) }}" method="POST" id="update" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="form-group">
@@ -36,6 +36,24 @@
                         <label for="">Phone</label>
                         <input type="phone" name="phone" value="{{ $user->phone }}" class="form-control"
                             id="">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile">Profile Image</label>
+                        <div class="mb-2">
+                            <img src="{{ $user->profile ? asset('storage/' . $user->profile) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=0D8ABC&color=fff' }}"
+                                alt="{{ $user->name }}" class="rounded-circle" width="72" height="72"
+                                style="object-fit: cover;">
+                        </div>
+                        <input type="file" name="profile" class="form-control" id="profile" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select name="status" class="form-control" id="status" required>
+                            <option value="{{ \App\Enums\UserStatus::Active->value }}"
+                                @selected(old('status', $user->status?->value) === \App\Enums\UserStatus::Active->value)>Active</option>
+                            <option value="{{ \App\Enums\UserStatus::InActive->value }}"
+                                @selected(old('status', $user->status?->value) === \App\Enums\UserStatus::InActive->value)>InActive</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="">Password</label>

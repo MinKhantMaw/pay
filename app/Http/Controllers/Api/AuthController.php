@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserStatus;
 use App\Helpers\ApiResponse;
 use App\Helpers\WalletGenerate;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\TransferFormValidate;
 use App\Http\Resources\NotificationDetailResource;
 use App\Http\Resources\NotificationResource;
@@ -14,6 +16,7 @@ use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Services\LoginSecurityService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +41,8 @@ class AuthController extends Controller
         $user->ip = $request->ip();
         $user->user_agent = $request->server('HTTP_USER_AGENT');
         $user->login_at = date('Y-m-d H:i:s');
+        $user->status = UserStatus::Active;
+        $user->failed_login_attempts = 0;
         $user->password = Hash::make($request->password);
         $user->save();
 
@@ -66,48 +71,61 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request, LoginSecurityService $loginSecurityService)
     {
-        $request->validate([
-            'phone' => 'required',
-            'password' => 'required',
-        ]);
+        $user = User::where('phone', $request->phone)->first();
 
-        if (Auth::attempt(['phone' => $request->phone, 'password' => $request->password])) {
-            $user = auth()->user();
-
-            $user->ip = $request->ip();
-            $user->user_agent = $request->server('HTTP_USER_AGENT');
-            $user->login_at = date('Y-m-d H:i:s');
-            $user->update();
-
-            Wallet::firstOrCreate(
-
-                [
-                    'user_id' => $user->id,
-                ],
-
-                [
-                    'account_number' => WalletGenerate::accountNumber(),
-                    'amount' => 0,
-                ]
-
-            );
-
-            $token = $user->createToken('Pay Mal')->accessToken;
-
+        if (! $user) {
             return response()->json([
-                'status' => 'Login Successfully',
-                'data' => $user,
-                'authorisation' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                ],
-            ]);
+                'status' => trans('auth.failed'),
+            ], 422);
         }
 
+        if ($blockMessage = $loginSecurityService->blockMessage($user)) {
+            return response()->json([
+                'status' => $blockMessage,
+            ], 403);
+        }
+
+        if (! Hash::check($request->password, $user->password)) {
+            $message = $loginSecurityService->recordFailedAttempt($user);
+
+            return response()->json([
+                'status' => $message,
+            ], $message === LoginSecurityService::LOCKED_MESSAGE ? 429 : 422);
+        }
+
+        $loginSecurityService->clearFailedAttempts($user);
+
+        Auth::login($user);
+
+        $user->ip = $request->ip();
+        $user->user_agent = $request->server('HTTP_USER_AGENT');
+        $user->login_at = date('Y-m-d H:i:s');
+        $user->update();
+
+        Wallet::firstOrCreate(
+
+            [
+                'user_id' => $user->id,
+            ],
+
+            [
+                'account_number' => WalletGenerate::accountNumber(),
+                'amount' => 0,
+            ]
+
+        );
+
+        $token = $user->createToken('Pay Mal')->accessToken;
+
         return response()->json([
-            'stataus' => 'These credentials do not match our records.',
+            'status' => 'Login Successfully',
+            'data' => $user,
+            'authorisation' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ],
         ]);
     }
 

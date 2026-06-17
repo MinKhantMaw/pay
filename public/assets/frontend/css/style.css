@@ -2,6 +2,19 @@ body {
     background: #ededf5;
     font-size: 15px;
     font-family: "Poppins", sans-serif;
+    overflow-x: hidden;
+}
+
+html,
+body,
+#app {
+    max-width: 100%;
+}
+
+img,
+canvas,
+svg {
+    max-width: 100%;
 }
 
 .card {
@@ -90,6 +103,12 @@ body {
 .content {
     margin-top: 75px;
     margin-bottom: 75px;
+}
+
+.content .col-md-8,
+.header-menu .col-md-8,
+.bottom-menu .col-md-8 {
+    max-width: 100%;
 }
 
 /* ------Profile------- */
@@ -280,3 +299,114 @@ body {
     right: 15px;
     padding: 3px;
 } */
+
+@media (max-width: 767.98px) {
+    body {
+        font-size: 14px;
+    }
+
+    .header-menu {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .header-menu h3 {
+        font-size: 16px;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    .header-menu i {
+        font-size: 18px;
+    }
+
+    .content {
+        margin-top: 64px;
+        margin-bottom: 86px;
+    }
+
+    .content > .d-flex,
+    .header-menu > .d-flex,
+    .bottom-menu > .d-flex {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .card-body {
+        padding: .85rem;
+    }
+
+    .form-control,
+    .form-select,
+    textarea,
+    .input-group {
+        max-width: 100%;
+    }
+
+    .input-group {
+        flex-wrap: nowrap;
+    }
+
+    .transaction .d-flex.justify-content-between {
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .transaction h6,
+    .transaction p,
+    .notification h6,
+    .notification p,
+    .transaction-detail p {
+        overflow-wrap: anywhere;
+    }
+
+    .transaction .row > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .btn,
+    .swal2-styled {
+        min-height: 40px;
+    }
+
+    .bottom-menu p {
+        margin-bottom: 6px;
+        font-size: 11px;
+    }
+
+    .scan-tab {
+        bottom: 46px;
+    }
+
+    .modal-dialog {
+        max-width: calc(100vw - 20px);
+        margin: 10px auto;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 20px);
+        overflow-y: auto;
+    }
+
+    .swal2-popup {
+        width: calc(100vw - 24px) !important;
+    }
+}
+
+@media (max-width: 374.98px) {
+    .header-menu h3 {
+        font-size: 14px;
+    }
+
+    .wallet .my-card h4,
+    .wallet .my-card h5,
+    .wallet .my-card p {
+        font-size: 16px;
+    }
+
+    .shortcut-box img,
+    .function-box img {
+        margin-right: 8px;
+    }
+}
