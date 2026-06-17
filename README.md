@@ -1,66 +1,147 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pay
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Pay is a Laravel-based e-money wallet and transfer application with web UI and API support.
 
-## About Laravel
+It provides user wallet management, wallet-to-wallet transfers, scan-and-pay flows, transaction history, notifications, and a separate admin panel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- User registration and login
+- Wallet creation and balance tracking
+- Internal transfers between users with transaction records
+- Scan-and-pay workflow for QR-style transfers
+- Notification system with real-time broadcast support
+- User profile and password management
+- Admin panel for managing users, wallets, and notifications
+- API endpoints for mobile/web client integration
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Built With
 
-## Learning Laravel
+- Laravel 11
+- PHP 8.2+
+- Laravel Passport / Sanctum for API authentication
+- Laravel UI / Blade for frontend views
+- Pusher / Laravel Echo for realtime notifications
+- Yajra DataTables for admin list pages
+- Simple QrCode for receive QR flow
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Clone the repository
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```bash
+   git clone https://github.com/MinKhantMaw/pay.git
+   cd pay
+   ```
 
-## Laravel Sponsors
+2. Install PHP dependencies
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+   ```bash
+   composer install
+   ```
 
-### Premium Partners
+3. Install JavaScript dependencies
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+   ```bash
+   npm install
+   ```
 
-## Contributing
+4. Copy environment file
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+   ```bash
+   cp .env.example .env
+   ```
 
-## Code of Conduct
+5. Generate application key
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   ```bash
+   php artisan key:generate
+   ```
 
-## Security Vulnerabilities
+6. Configure `.env`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   - `APP_URL`
+   - `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+   - `BROADCAST_DRIVER` (for realtime notifications)
+   - `PUSHER_APP_ID`, `PUSHER_APP_KEY`, `PUSHER_APP_SECRET`, `PUSHER_APP_CLUSTER`
+
+7. Run database migrations
+
+   ```bash
+   php artisan migrate
+   ```
+
+8. Build frontend assets
+
+   ```bash
+   npm run build
+   ```
+
+9. Install Passport keys if using API auth
+
+   ```bash
+   php artisan passport:install
+   ```
+
+10. Start the application
+
+    ```bash
+    php artisan serve
+    ```
+
+## Usage
+
+### Web Routes
+
+- `/` - Authenticated dashboard
+- `/profile` - User profile page
+- `/wallet` - Wallet details
+- `/transfers` - Transfer money to another user
+- `/transactions` - Transaction history
+- `/receive-qr` - Receive QR code page
+- `/scan-and-pay` - Scan and pay flow
+- `/notification` - Notification list
+
+### API Routes
+
+- `POST /api/register` - Register a new user
+- `POST /api/login` - Authenticate and generate token
+- `GET /api/profile` - Fetch authenticated user profile
+- `POST /api/logout` - Logout
+- `GET /api/transaction` - List user transactions
+- `GET /api/transaction/{id}` - Transaction details
+- `GET /api/notification` - List notifications
+- `GET /api/notification/{id}` - Notification detail
+- `GET /api/to-account-verify` - Verify recipient by phone
+- `GET /api/transfer/confirm` - Confirm transfer data
+- `POST /api/transfer/complete` - Complete transfer
+- `GET /api/scan-and-pay-form` - Fetch scan-and-pay recipient details
+- `GET /api/scan-and-pay/confirm` - Confirm scan-and-pay data
+- `POST /api/scan-and-pay/complete` - Complete scan-and-pay transfer
+
+### Admin Panel
+
+Admin routes are mounted under `/admin` and require `admin_user` authentication. The admin panel includes management views for:
+
+- admin users
+- end users
+- wallets
+- notifications
+
+## Environment Notes
+
+- The app uses both `auth:api` and `auth:sanctum` middleware in API route definitions.
+- Real-time notifications rely on broadcast configuration.
+- The transfer and scan-and-pay flows require a minimum transfer amount of `1000 MMK`.
+
+## Useful Commands
+
+- `php artisan migrate` — apply database migrations
+- `php artisan db:seed` — seed sample data if seeds are available
+- `php artisan passport:install` — create Passport clients
+- `npm run dev` — start Vite development server
+- `npm run build` — compile frontend assets for production
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License.
