@@ -42,16 +42,16 @@ class UserController extends Controller
         return DataTables::of($users)
             ->addColumn('profile', function ($e) {
                 $profileUrl = $e->profile
-                    ? asset('storage/'.$e->profile)
-                    : 'https://ui-avatars.com/api/?name='.urlencode($e->name).'&background=0D8ABC&color=fff';
+                    ? asset('storage/' . $e->profile)
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($e->name) . '&background=0D8ABC&color=fff';
 
-                return '<img src="'.$profileUrl.'" alt="'.e($e->name).'" class="rounded-circle" width="42" height="42" style="object-fit: cover;">';
+                return '<img src="' . $profileUrl . '" alt="' . e($e->name) . '" class="rounded-circle" width="42" height="42" style="object-fit: cover;">';
             })
             ->addColumn('status', function ($e) {
                 $status = $e->status?->value ?? 'InActive';
                 $badgeClass = $e->status?->badgeClass() ?? 'badge-danger';
 
-                return '<span class="badge '.$badgeClass.'">'.$status.'</span>';
+                return '<span class="badge ' . $badgeClass . '">' . $status . '</span>';
             })
             ->editColumn('user_agent', function ($e) {
                 if ($e->user_agent) {
@@ -63,9 +63,9 @@ class UserController extends Controller
 
                     return '<table class="table">
              <tbody>
-                <tr><td>Device</td><td>'.$device.'</td></tr> .
-                <tr><td>Platform</td><td>'.$platform.'</td></tr> .
-                <tr><td>Browser</td><td>'.$browser.'</td></tr>
+                <tr><td>Device</td><td>' . $device . '</td></tr> .
+                <tr><td>Platform</td><td>' . $platform . '</td></tr> .
+                <tr><td>Browser</td><td>' . $browser . '</td></tr>
              </tbody>
             </table>';
                 }
@@ -74,11 +74,11 @@ class UserController extends Controller
             })
             ->addColumn('action', function ($each) {
                 $admin = auth('admin_user')->user();
-                $show_icon = $admin->can('user.view') ? '<a href="'.route('user.user.show', $each->id).'" class="text-info"><i class="fas fa-eye"></i></a>' : '';
-                $edit_icon = $admin->can('user.update') ? '<a href="'.route('user.user.edit', $each->id).'" class="text-warning"><i class="fas fa-edit"></i></a>' : '';
-                $delete_icon = $admin->can('user.delete') ? '<a href="#" class="text-danger delete" data-id="'.$each->id.'"><i class="fas fa-trash"></i></a>' : '';
+                $show_icon = $admin->can('user.view') ? '<a href="' . route('user.user.show', $each->id) . '" class="text-info"><i class="fas fa-eye"></i></a>' : '';
+                $edit_icon = $admin->can('user.update') ? '<a href="' . route('user.user.edit', $each->id) . '" class="text-warning"><i class="fas fa-edit"></i></a>' : '';
+                $delete_icon = $admin->can('user.delete') ? '<a href="#" class="text-danger delete" data-id="' . $each->id . '"><i class="fas fa-trash"></i></a>' : '';
 
-                return '<div class="action-icon">'.$show_icon.$edit_icon.$delete_icon.'</div>';
+                return '<div class="action-icon">' . $show_icon . $edit_icon . $delete_icon . '</div>';
             })
             ->rawColumns(['profile', 'status', 'user_agent', 'action'])
             ->make(true);
@@ -113,7 +113,7 @@ class UserController extends Controller
                 'exception' => $err,
             ]);
 
-            return back()->withErrors(['fail' => 'The user account could not be created. Please check the details and try again.'])->withInput();
+            return back()->withErrors(['fail' => 'The user account could not be created. Please check the details and try again!.'])->withInput();
         }
     }
 
