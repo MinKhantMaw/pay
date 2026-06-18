@@ -44,6 +44,7 @@
             @include('backend.layouts.sidebar')
             <div class="app-main__outer">
                 <div class="app-main__inner">
+                    @include('backend.layouts.flag')
                     @yield('content')
                 </div>
                 <div class="app-wrapper-footer">

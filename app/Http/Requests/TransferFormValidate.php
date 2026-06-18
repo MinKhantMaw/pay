@@ -24,16 +24,20 @@ class TransferFormValidate extends FormRequest
     public function rules()
     {
         return [
-            'to_phone' => 'required',
-            'amount' => 'required',
+            'to_phone' => ['required', 'string'],
+            'amount' => ['required', 'integer', 'min:1000'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
     public function messages()
     {
         return [
-            'to_phone.required' => 'Please fill the to account information .',
-            'amount.required' => ' Please fill the amount is required.',
+            'to_phone.required' => 'Please enter the receiver phone number.',
+            'amount.required' => 'Please enter the amount.',
+            'amount.integer' => 'The amount must be a whole number.',
+            'amount.min' => 'The amount must be at least 1,000 MMK.',
+            'description.max' => 'The description must not be longer than 1,000 characters.',
         ];
     }
 }

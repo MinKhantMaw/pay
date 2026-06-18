@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAdminUser extends FormRequest
 {
@@ -28,6 +29,8 @@ class StoreAdminUser extends FormRequest
             'email' => 'required|unique:admin_users,email',
             'phone' => 'required|unique:admin_users,phone|min:11|max:20',
             'password' => 'required|min:6|max:15',
+            'roles' => 'nullable|array',
+            'roles.*' => Rule::exists('roles', 'name')->where('guard_name', 'admin_user'),
         ];
     }
 }

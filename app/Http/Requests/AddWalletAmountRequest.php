@@ -14,19 +14,22 @@ class AddWalletAmountRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required',
-            'amount' => 'required|integer|min:1000',
-            'description' => 'required',
+            'user_id' => ['required', 'exists:users,id'],
+            'amount' => ['required', 'integer', 'min:1000'],
+            'description' => ['required', 'string', 'max:1000'],
         ];
     }
 
     public function messages()
     {
         return [
-            'user_id.required' => 'You need to fill in the user name and phone number',
-            'amount.required' => 'You need to fill in the amount',
-            'amount.min' => 'The amount must be as less than 1000',
-            'description.required' => 'You need to fill in the description',
+            'user_id.required' => 'Please choose a wallet user.',
+            'user_id.exists' => 'The selected user could not be found.',
+            'amount.required' => 'Please enter the amount.',
+            'amount.integer' => 'The amount must be a whole number.',
+            'amount.min' => 'The amount must be at least 1,000 MMK.',
+            'description.required' => 'Please enter a description for this adjustment.',
+            'description.max' => 'The description must not be longer than 1,000 characters.',
         ];
     }
 }

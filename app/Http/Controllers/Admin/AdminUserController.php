@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Jenssegers\Agent\Agent;
+use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
 
 class AdminUserController extends Controller
@@ -50,8 +51,9 @@ class AdminUserController extends Controller
 
             })
             ->addColumn('action', function ($each) {
-                $edit_icon = '<a href="'.route('admin.admin-user.edit', $each->id).'" class="text-warning"><i class="fas fa-edit"></i></a>';
-                $delete_icon = '<a href="#" class="text-danger delete" data-id="'.$each->id.'"><i class="fas fa-trash"></i></a>';
+                $admin = auth('admin_user')->user();
+                $edit_icon = $admin->can('role.manage') ? '<a href="'.route('admin.admin-user.edit', $each->id).'" class="text-warning"><i class="fas fa-edit"></i></a>' : '';
+                $delete_icon = $admin->can('role.manage') ? '<a href="#" class="text-danger delete" data-id="'.$each->id.'"><i class="fas fa-trash"></i></a>' : '';
 
                 return '<div class="action-icon">'.$edit_icon.$delete_icon.'</div>';
             })
@@ -66,7 +68,9 @@ class AdminUserController extends Controller
      */
     public function create()
     {
-        return view('backend.admin_users.create');
+        $roles = Role::where('guard_name', 'admin_user')->orderBy('name')->get();
+
+        return view('backend.admin_users.create', compact('roles'));
     }
 
     /**
@@ -83,6 +87,7 @@ class AdminUserController extends Controller
         $admin_user->phone = $request->phone;
         $admin_user->password = Hash::make($request->password);
         $admin_user->save();
+        $admin_user->syncRoles($request->input('roles', []));
 
         return redirect()->route('admin.admin-user.index')->with('create', 'Admin User Create Successfully');
     }
@@ -107,8 +112,9 @@ class AdminUserController extends Controller
     public function edit($id)
     {
         $admin_user = AdminUser::findOrFail($id);
+        $roles = Role::where('guard_name', 'admin_user')->orderBy('name')->get();
 
-        return view('backend.admin_users.edit', compact('admin_user'));
+        return view('backend.admin_users.edit', compact('admin_user', 'roles'));
     }
 
     /**
@@ -126,6 +132,7 @@ class AdminUserController extends Controller
         $admin_user->phone = $request->phone;
         $admin_user->password = $request->password ? Hash::make($request->password) : $admin_user->password;
         $admin_user->update();
+        $admin_user->syncRoles($request->input('roles', []));
 
         return redirect()->route('admin.admin-user.index')->with('update', 'Admin User Update Successfully');
     }

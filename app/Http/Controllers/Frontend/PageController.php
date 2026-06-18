@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class PageController extends Controller
@@ -158,11 +159,11 @@ class PageController extends Controller
         }
 
         if (! $from_account->wallet || ! $to_account->wallet) {
-            return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
+            return back()->withErrors(['fail' => 'The transfer details are invalid. Please check the receiver and try again.'])->withInput();
         }
 
         if ($from_account->wallet->amount < $amount) {
-            return back()->withErrors(['amount' => 'The amount is not enought...!'])->withInput();
+            return back()->withErrors(['amount' => 'Your wallet balance is not enough for this transfer.'])->withInput();
         }
 
         DB::beginTransaction();
@@ -227,7 +228,12 @@ class PageController extends Controller
         } catch (\Exception  $error) {
             DB::rollBack();
 
-            return back()->withErrors(['fail' => 'Something was wrong.'.$error->getMessage()])->withInput();
+            Log::error('Web transfer failed.', [
+                'user_id' => auth()->id(),
+                'exception' => $error,
+            ]);
+
+            return back()->withErrors(['fail' => 'The transfer could not be completed. Please try again.'])->withInput();
         }
     }
 
@@ -327,7 +333,7 @@ class PageController extends Controller
         $from_account = auth()->guard('web')->user();
         $to_account = User::where('phone', $request->to_phone)->first();
         if (! $to_account) {
-            return back()->withErrors(['fail' => 'QR is invalid...!']);
+            return back()->withErrors(['fail' => 'The QR code is invalid or the receiver account could not be found.']);
         }
 
         return view('frontend.scan_and_pay_form', ['to_account' => $to_account, 'from_account' => $from_account]);
@@ -401,11 +407,11 @@ class PageController extends Controller
         }
 
         if (! $from_account->wallet || ! $to_account->wallet) {
-            return back()->withErrors(['fail' => 'Something was wrong.The given data is invalid.'])->withInput();
+            return back()->withErrors(['fail' => 'The scan and pay details are invalid. Please check the receiver and try again.'])->withInput();
         }
 
         if ($from_account->wallet->amount < $amount) {
-            return back()->withErrors(['amount' => 'The amount is not enought...!'])->withInput();
+            return back()->withErrors(['amount' => 'Your wallet balance is not enough for this transfer.'])->withInput();
         }
 
         DB::beginTransaction();
@@ -470,7 +476,12 @@ class PageController extends Controller
         } catch (\Exception  $error) {
             DB::rollBack();
 
-            return back()->withErrors(['fail' => 'Something was wrong.'.$error->getMessage()])->withInput();
+            Log::error('Web scan and pay transfer failed.', [
+                'user_id' => auth()->id(),
+                'exception' => $error,
+            ]);
+
+            return back()->withErrors(['fail' => 'The scan and pay transfer could not be completed. Please try again.'])->withInput();
         }
     }
 }

@@ -12,7 +12,7 @@ class WalletGenerate
         $number = mt_rand(1000000000000000, 9999999999999999);
 
         if (Wallet::where('account_number', $number)->exists()) {
-            self::accountNumber();
+            return self::accountNumber();
         }
 
         return $number;
@@ -23,7 +23,7 @@ class WalletGenerate
         $number = mt_rand(1000000000000000, 9999999999999999);
 
         if (Transaction::where('ref_no', $number)->exists()) {
-            self::refNumber();
+            return self::refNumber();
         }
 
         return $number;
@@ -34,7 +34,7 @@ class WalletGenerate
         $number = mt_rand(1000000000000000, 9999999999999999);
 
         if (Transaction::where('trx_id', $number)->exists()) {
-            self::trxID();
+            return self::trxID();
         }
 
         return $number;

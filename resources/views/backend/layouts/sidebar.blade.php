@@ -39,24 +39,53 @@
                         Dashboards
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('admin.admin-user.index') }}" class="@yield('admin-user-index')">
-                        <i class="metismenu-icon pe-7s-users">
-                        </i>Admin Users
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('user.user.index') }}" class="@yield('user-index')">
-                        <i class="metismenu-icon pe-7s-users">
-                        </i> Users
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('wallet.index') }}" class="@yield('wallet-index')">
-                        <i class="metismenu-icon pe-7s-wallet">
-                        </i> Wallet Management
-                    </a>
-                </li>
+                @can('role.manage')
+                    <li>
+                        <a href="{{ route('admin.admin-user.index') }}" class="@yield('admin-user-index')">
+                            <i class="metismenu-icon pe-7s-users"></i>Admin Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.roles.index') }}" class="@yield('role-index')">
+                            <i class="metismenu-icon pe-7s-key"></i>Roles
+                        </a>
+                    </li>
+                @endcan
+                @can('role.view')
+                    <li>
+                        <a href="{{ route('admin.permissions.index') }}" class="@yield('permission-index')">
+                            <i class="metismenu-icon pe-7s-lock"></i>Permissions
+                        </a>
+                    </li>
+                @endcan
+                @can('user.view')
+                    <li>
+                        <a href="{{ route('user.user.index') }}" class="@yield('user-index')">
+                            <i class="metismenu-icon pe-7s-users"></i> Users
+                        </a>
+                    </li>
+                @endcan
+                @can('wallet.view')
+                    <li>
+                        <a href="{{ route('wallet.index') }}" class="@yield('wallet-index')">
+                            <i class="metismenu-icon pe-7s-wallet"></i> Wallet Management
+                        </a>
+                    </li>
+                @endcan
+                @can('approval.view')
+                    <li>
+                        <a href="{{ route('admin.approvals.index') }}" class="@yield('approval-index')">
+                            <i class="metismenu-icon pe-7s-check"></i> Approvals
+                        </a>
+                    </li>
+                @endcan
+                @can('audit.view')
+                    <li>
+                        <a href="{{ route('admin.audit-logs.index') }}" class="@yield('audit-log-index')">
+                            <i class="metismenu-icon pe-7s-note2"></i> Audit Logs
+                        </a>
+                    </li>
+                @endcan
             </ul>
         </div>
     </div>

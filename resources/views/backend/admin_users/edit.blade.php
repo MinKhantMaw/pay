@@ -41,6 +41,14 @@
                         <label for="">Password</label>
                         <input type="password" name="password" class="form-control" id="">
                     </div>
+                    <div class="form-group">
+                        <label for="">Roles</label>
+                        <select name="roles[]" class="form-control roles" multiple>
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->name }}" @selected($admin_user->hasRole($role->name))>{{ $role->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="d-flex justify-content-center">
                         <button type="submit" class="btn btn-success mr-2" id=""> Update </button>
                         <button type="reset" onclick="history.back()" class="btn btn-danger ">Cancel</button>
@@ -56,7 +64,10 @@
 
     <script>
         $(document).ready(function() {
-
+            $('.roles').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Select roles'
+            });
         });
     </script>
 @endsection

@@ -20,6 +20,7 @@
         "proengsoft/laravel-jsvalidation": "^4.7",
         "pusher/pusher-php-server": "^7.2",
         "simplesoftwareio/simple-qrcode": "~2",
+        "spatie/laravel-permission": "^6.0",
         "yajra/laravel-datatables-oracle": "^11.0"
     },
     "require-dev": {

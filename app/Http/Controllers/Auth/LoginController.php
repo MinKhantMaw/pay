@@ -8,6 +8,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Providers\RouteServiceProvider;
+use App\Services\AuditLogService;
 use App\Services\LoginSecurityService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -67,6 +68,10 @@ class LoginController extends Controller
         $user = User::where($this->username(), $request->input($this->username()))->first();
 
         if (! $user) {
+            app(AuditLogService::class)->log('login_failed', 'Auth', 'User login failed: unknown phone.', null, [
+                'phone' => $request->input($this->username()),
+            ], null, $request);
+
             throw ValidationException::withMessages([
                 $this->username() => [trans('auth.failed')],
             ]);
@@ -80,6 +85,10 @@ class LoginController extends Controller
 
         if (! Hash::check($request->password, $user->password)) {
             $message = $loginSecurityService->recordFailedAttempt($user);
+            app(AuditLogService::class)->log('login_failed', 'Auth', 'User login failed.', null, [
+                'user_id' => $user->id,
+                'message' => $message,
+            ], $user, $request);
 
             throw ValidationException::withMessages([
                 $this->username() => [$message],
@@ -100,6 +109,9 @@ class LoginController extends Controller
         $user->user_agent = $request->server('HTTP_USER_AGENT');
         $user->login_at = date('Y-m-d H:i:s');
         $user->update();
+        app(AuditLogService::class)->log('login_success', 'Auth', 'User login success.', null, [
+            'user_id' => $user->id,
+        ], $user, $request);
         Wallet::firstOrCreate(
 
             [

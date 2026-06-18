@@ -11,6 +11,12 @@ class Wallet extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'is_active' => 'boolean',
+        'disabled_at' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

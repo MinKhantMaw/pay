@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -365,7 +366,12 @@ class AuthController extends Controller
         } catch (\Exception $error) {
             DB::rollback();
 
-            return ApiResponse::fail('Something wrong. '.$error->getMessage(), null, 422);
+            Log::error('API transfer failed.', [
+                'user_id' => auth()->id(),
+                'exception' => $error,
+            ]);
+
+            return ApiResponse::fail('The transfer could not be completed. Please check the details and try again.', null, 422);
         }
     }
 
@@ -543,7 +549,12 @@ class AuthController extends Controller
         } catch (\Exception $error) {
             DB::rollback();
 
-            return ApiResponse::fail('Something wrong. '.$error->getMessage(), null, 422);
+            Log::error('API scan and pay transfer failed.', [
+                'user_id' => auth()->id(),
+                'exception' => $error,
+            ]);
+
+            return ApiResponse::fail('The scan and pay transfer could not be completed. Please check the details and try again.', null, 422);
         }
     }
 }
